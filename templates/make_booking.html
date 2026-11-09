@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+    <head>
+        <meta charset="UTF-8">
+        <title>Makers BnB</title>
+        <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css">
+        <link rel="stylesheet" href="/static/styles.css">
+    </head>
+    <body>
+        <header>
+            <h1>Makers BnB</h1>
+            <nav>
+                <a>Spaces</a>
+                <a>Bookings</a>
+                <a>Sign Out</a>
+            </nav>
+        </header>
+        <main>
+            <h2>Name of Space</h2>
+            <p>Description of space</p>
+            
+            <h2>{{ month_name }} {{ year }}</h2>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Mon</th>
+                        <th>Tue</th>
+                        <th>Wed</th>
+                        <th>Thu</th>
+                        <th>Fri</th>
+                        <th>Sat</th>
+                        <th>Sun</th>
+                    </tr>
+                </thead>
+                
+                <tbody>
+                    {% for week in weeks %}
+                    <tr>
+                        {% for day in week %}
+                        
+                            {% if day == 0 %}
+                            <td></td>
+                        
+                            {% elif day in available_dates %}
+                            <td class="available">{{ day }}</td>
+                        
+                            {% else %}
+                            <td>{{ day }}</td>
+                        
+                            {% endif %}
+                        
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <h3>Pick a night</h3>
+            <div><input type="date"></div>
+            <a>Request to Book!</a>
+        </main>
+    </body>
+</html>
