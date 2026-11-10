@@ -1,7 +1,16 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect 
 import calendar
+from database_connection import DatabaseConnection
+#User imports
+from lib.user import User
+from lib.user_repository import UserRepository
 
 app = Flask(__name__)
+
+def get_connection():
+    connection = DatabaseConnection(test_mode=app.config.get("TESTING", False))
+    connection.connect()
+    return connection
 
 #  View landing/ signup page
 @app.route('/', methods=['GET'])
@@ -55,6 +64,18 @@ def get_requests():
 def get_requests_made():
     return render_template("view_requests.html")
 
+#receive signup form and save new user - then redirects to /login
+@app.route('/users', methods=['POST'])
+def post_users():
+    repo = UserRepository(get_connection())
+    user = User(
+        request.form["username"],
+        request.form["email"],
+        request.form["password"],
+        "is_host" in request.form,
+    )
+    repo.create(user)
+    return redirect("/login")
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)
