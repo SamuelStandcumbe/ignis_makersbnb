@@ -1,10 +1,18 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect 
 import calendar
-from database_connection import *
 from lib.space_repository import *
 from lib.space import*
+from database_connection import DatabaseConnection
+#User imports
+from lib.user import User
+from lib.user_repository import UserRepository
 
 app = Flask(__name__)
+
+def get_connection():
+    connection = DatabaseConnection(test_mode=app.config.get("TESTING", False))
+    connection.connect()
+    return connection
 
 #  View landing/ signup page
 @app.route('/', methods=['GET'])
@@ -59,9 +67,22 @@ def get_requests_made():
 def get_all_available_spaces():
     connection = DatabaseConnection()
     connection.connect()
-    available_spaces_repository = SpaceRepository()
+    available_spaces_repository = SpaceRepository(connection)
     available_spaces = available_spaces_repository.all()
     return render_template("available_spaces.html", available_spaces = available_spaces)
+
+#receive signup form and save new user - then redirects to /login
+@app.route('/users', methods=['POST'])
+def post_users():
+    repo = UserRepository(get_connection())
+    user = User(
+        request.form["username"],
+        request.form["email"],
+        request.form["password"],
+        "is_host" in request.form,
+    )
+    repo.create(user)
+    return redirect("/login")
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)
