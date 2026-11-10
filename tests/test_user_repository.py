@@ -15,4 +15,4 @@ def test_create_adds_user(db_connection):
     db_connection.seed("seeds/ignis_makersbnb.sql")
     repo = UserRepository(db_connection)
     repo.create(User("carol", "carol@gmail.com", "Password234", False, 3))
-
+    assert repo.all()[-1] == User("carol", "carol@gmail.com", "Password234", False, 3)
