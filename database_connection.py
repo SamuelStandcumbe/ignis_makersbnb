@@ -1,7 +1,7 @@
 import os, psycopg
 from flask import g
 from psycopg.rows import dict_row
-
+# noe of the dependances have been installed
 
 # This class helps us interact with the database.
 # It wraps the underlying psycopg library that we are using.
