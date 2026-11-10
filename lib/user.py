@@ -1,4 +1,4 @@
-class USER():
+class User():
     def __init__(self, username, email, password, host, id=None):
         self.id = id
         self.username = username
@@ -10,4 +10,4 @@ class USER():
         return self.__dict__ == other.__dict__
 
     def __repr__(self):
-        return f"USER({self.username}, {self.email}, {self.password}, {self.host}, {self.id})"
+        return f"User({self.username}, {self.email}, {self.password}, {self.host}, {self.id})"
