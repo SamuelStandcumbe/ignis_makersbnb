@@ -77,5 +77,6 @@ def post_users():
     repo.create(user)
     return redirect("/login")
 
+
 if __name__ == '__main__':
     app.run(debug=True, port=5001)
