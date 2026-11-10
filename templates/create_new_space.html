@@ -1,32 +1,36 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>List a new space - MakersBnB</title>
-    <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css">
+<title>List a Space - MakersBnB</title>
+<link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css">
 </head>
 <body>
-    <main>
-        <h1>List a new space</h1>
-        <form action="/spaces" method="POST">
-            <label for="name">Name</label>
-            <input type="text" id="name" name="name" required>
+<main>
+<h1>List a Space</h1>
 
-            <label for="description">Description</label>
-            <textarea id="description" name="description" rows="5" required></textarea>
+{% if errors %}
+    <ul class="errors">
+    {% for error in errors %}
+        <li>{{ error }}</li>
+    {% endfor %}
+    </ul>
+{% endif %}
 
-            <label for="price">Price per night (£)</label>
-            <input type="text" id="price" name="price" inputmode="decimal" pattern="[0-9]+(\.[0-9]{1,2})?" title="Numbers only, e.g. 85 or 85.50" required>
+<form action="/spaces" method="POST">
+    <label for="space_name">Name</label>
+    <input type="text" id="space_name" name="space_name" maxlength="255" value="{{ form.get('space_name', '') }}">
 
-            <label for="available_from">Available from</label>
-            <input type="date" id="available_from" name="available_from" required>
+    <label for="location">Location</label>
+    <input type="text" id="location" name="location" maxlength="255" value="{{ form.get('location', '') }}">
 
-            <label for="available_to">Available to</label>
-            <input type="date" id="available_to" name="available_to" required>
+    <label for="description">Description</label>
+    <textarea id="description" name="description" maxlength="255">{{ form.get('description', '') }}</textarea>
 
-            <button type="submit">List my space</button>
-        </form>
-    </main>
+    <label for="price">Price per night (£)</label>
+    <input type="number" id="price" name="price" step="0.01" min="0" value="{{ form.get('price', '') }}">
+
+    <input type="submit" value="List my space">
+</form>
+</main>
 </body>
 </html>
