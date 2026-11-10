@@ -32,8 +32,10 @@ CREATE TABLE requests (
 INSERT INTO users (username, email, password, host) VALUES ('Alice Example', 'alice@example.com', 'password123', TRUE);
 INSERT INTO users (username, email, password, host) VALUES ('Bob Example', 'bob@example.com', 'password456', FALSE);
 
-INSERT INTO spaces (space_name, location, description, price, user_id) VALUES ('Fishermans cottage by the harbour', 'Whitstable, Kent', 'Compact studio with a double bed, kitchenette and fast wifi. Five minutes from Shoreditch High Street station.' , 95, 1);
+INSERT INTO spaces (space_name, location, description, price, user_id) VALUES ('Fisherman''s cottage by the harbour', 'Whitstable, Kent', 'Compact studio with a double bed, kitchenette and fast wifi. Five minutes from Shoreditch High Street station.' , 95, 1);
 INSERT INTO spaces (space_name, location, description, price, user_id) VALUES ('Stone barn in the Peak District', 'Edale, Derbyshire', 'Converted barn at the start of the Pennine Way. Boot room, drying rack and a big kitchen table.', 140, 1);
+INSERT INTO spaces (space_name, location, description, price, user_id) VALUES ('Bright studio near Brick Lane', 'Shoreditch, London', 'Compact studio with a double bed, kitchenette and fast wifi. Five minutes from Shoreditch High Street station.', 120, 1);
 
 INSERT INTO requests (space_id, user_id, approved, requested_date) VALUES (1, 2, FALSE, '2026-10-10');
-INSERT INTO requests (space_id, user_id, approved, requested_date) VALUES (2, 2, TRUE, '2026-10-11');
+INSERT INTO requests (space_id, user_id, approved, requested_date) VALUES (2, 2, TRUE, '2026-11-28');
+INSERT INTO requests (space_id, user_id, approved, requested_date) VALUES (2, 2, TRUE, '2026-11-25');
