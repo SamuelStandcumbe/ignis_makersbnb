@@ -1,20 +1,91 @@
+
+import os
+import calendar
+import psycopg
+from datetime import date, timedelta
+from flask import Flask, render_template, request, redirect, session
+from database_connection import DatabaseConnection, get_flask_database_connection
+from lib.space import Space
 from lib.space_repository import SpaceRepository
 from lib.request_repository import RequestRepository
-from database_connection import DatabaseConnection
-from flask import Flask, render_template, request
-from datetime import date, timedelta
-import calendar
+from lib.user import User
+from lib.user_repository import UserRepository
+
 
 app = Flask(__name__)
-app.config["DATABASE_CONNECTION"] = None
+app.secret_key = os.getenv("SECRET_KEY", "dev-secret-change-me")
 
+
+def get_connection():
+    connection = DatabaseConnection(test_mode=app.config.get("TESTING", False))
+    connection.connect()
+    return connection
+
+
+# View landing / signup page
+@app.route('/', methods=['GET'])
+def get_sign_up():
+    return render_template("sign_up_page.html")
+
+
+# View form for login
+@app.route('/login', methods=['GET'])
+def get_log_in():
+    return render_template("log_in_page.html")
+
+
+# View a list of all available spaces
+@app.route('/spaces', methods=['GET'])
+def get_available_spaces():
+    return render_template("available_spaces.html")
+
+
+# View form to create a new space (logged-in users only)
+@app.route('/spaces/new', methods=['GET'])
+def get_create_space_form():
+    if "user_id" not in session:
+        return redirect("/login")
+    return render_template("create_new_space.html", errors=[], form={})
+
+
+# Save a new space for the logged-in user
+@app.route('/spaces', methods=['POST'])
+def create_space():
+    if "user_id" not in session:
+        return redirect("/login")
+
+    space = Space(
+        None,
+        request.form.get("space_name", "").strip(),
+        request.form.get("location", "").strip(),
+        request.form.get("description", "").strip(),
+        request.form.get("price", "").strip(),
+        session["user_id"],
+    )
+
+    if not space.is_valid():
+        return render_template(
+            "create_new_space.html",
+            errors=space.generate_errors(),
+            form=request.form
+        ), 400
+
+    try:
+        SpaceRepository(get_flask_database_connection(app)).create(space)
+    except psycopg.Error:
+        return render_template(
+            "create_new_space.html",
+            errors=["Sorry, we could not save your space. Please try again."],
+            form=request.form
+        ), 500
+
+    return redirect("/spaces")
+
+
+# View available dates for a specific property
 @app.route('/make_request/<id>', methods=["GET"])
 def get_booking_page(id):
-    connection = app.config["DATABASE_CONNECTION"]
-    if connection is None:
-        connection = DatabaseConnection()
-        connection.connect()
-    print(connection._database_name())
+    connection = get_flask_database_connection(app)
 
     space_repository = SpaceRepository(connection)
     space = space_repository.find_by_space_id(id)
@@ -29,7 +100,7 @@ def get_booking_page(id):
     first_day = date(year, month, 1)
 
     previous_month = first_day - timedelta(days=1)
-    next_month = date(year, month, calendar.monthrange(year, month)[1]) + timedelta(days=1)
+    next_month = first_day + timedelta(days=calendar.monthrange(year, month)[1])
 
     weeks = calendar.Calendar().monthdatescalendar(year, month)
 
@@ -48,6 +119,32 @@ def get_booking_page(id):
         space_price=space.price,
         space_description=space.description
     )
+
+
+# View requests received by a space owner
+@app.route('/requests', methods=['GET'])
+def get_requests():
+    return render_template("requests.html")
+
+
+# View requests you have made on spaces
+@app.route('/view_requests', methods=['GET'])
+def get_requests_made():
+    return render_template("view_requests.html")
+
+
+# Receive signup form and save new user
+@app.route('/users', methods=['POST'])
+def post_users():
+    repo = UserRepository(get_connection())
+    user = User(
+        request.form["username"],
+        request.form["email"],
+        request.form["password"],
+        "is_host" in request.form,
+    )
+    repo.create(user)
+    return redirect("/login")
 
 
 if __name__ == '__main__':

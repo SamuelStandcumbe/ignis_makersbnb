@@ -5,16 +5,17 @@ from app import app
 
 @pytest.fixture
 def db_connection():
-    conn = DatabaseConnection(test_mode=True)
-    conn.connect()
-    return conn
+    connection = DatabaseConnection(test_mode=True)
+    connection.connect()
+    return connection
 
 
 @pytest.fixture
 def client(db_connection):
     db_connection.seed("seeds/ignis_makersbnb.sql")
-    app.config["DATABASE_CONNECTION"] = db_connection
+
+    app.config["TESTING"] = True
 
     yield app.test_client()
 
-    app.config["DATABASE_CONNECTION"] = None
+    app.config["TESTING"] = False

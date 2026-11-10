@@ -7,6 +7,32 @@ class Space:
         self.price = price
         self.user_id = user_id
 
+    def is_valid(self):
+        return self.generate_errors() == []
+
+    def generate_errors(self):
+        errors = []
+
+        if not self.space_name:
+            errors.append("Name is required")
+
+        if not self.location:
+            errors.append("Location is required")
+
+        if not self.description:
+            errors.append("Description is required")
+
+        if self.price in (None, ""):
+            errors.append("Price is required")
+        else:
+            try:
+                if float(self.price) <= 0:
+                    errors.append("Price must be more than 0")
+            except ValueError:
+                errors.append("Price must be a number")
+
+        return errors
+
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
 
