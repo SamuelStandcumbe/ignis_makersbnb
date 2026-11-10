@@ -1,5 +1,8 @@
 from flask import Flask, render_template
 import calendar
+from database_connection import *
+from lib.space_repository import *
+from lib.space import*
 
 app = Flask(__name__)
 
@@ -19,6 +22,14 @@ def show_calendar():
         month_name=calendar.month_name[month],
         year=year
     )
+
+@app.route('/', methods=['GET'])
+def get_all_available_spaces():
+    connection = DatabaseConnection()
+    connection.connect()
+    available_spaces_repository = SpaceRepository()
+    available_spaces = available_spaces_repository.all()
+    return render_template("available_spaces.html", boavailable_spacesoks = available_spaces)
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)
