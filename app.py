@@ -2,7 +2,7 @@ import os
 import calendar
 import psycopg
 from datetime import date, timedelta
-from flask import Flask, render_template, request, redirect, session
+from flask import Flask, render_template, request, redirect, session, flash
 from database_connection import DatabaseConnection, get_flask_database_connection
 from lib.space import Space
 from lib.space_repository import SpaceRepository
@@ -28,7 +28,33 @@ def get_sign_up():
 # View form for login
 @app.route('/login', methods=['GET'])
 def get_log_in():
+    if 'user_id' in session:
+        return redirect('/spaces')
+    
     return render_template("log_in_page.html")
+
+@app.route('/sessions', methods=['POST'])
+def create_sessions():
+    connection = DatabaseConnection()
+    connection.connect()
+    user_repository = UserRepository(connection)
+
+    email_address = request.form["email"]
+    password = request.form["password"]
+
+    user = user_repository.find_by_email_address(email_address)
+    if user is not None  and user.password == password:
+        session["user_id"] = user.id
+        session["email"] = user.email
+        return redirect("/spaces")
+    else:
+        flash("⚠️ Invalid Email Address or Password! ")
+        return redirect("/login")
+
+# To view a list of all available spaces
+@app.route('/spaces', methods=['GET'])
+def get_available_spaces():
+    return render_template("available_spaces.html")
 
 # View form to create a new space (logged-in users only)
 @app.route('/spaces/new', methods=['GET'])
@@ -166,6 +192,12 @@ def post_users():
     )
     repo.create(user)
     return redirect("/login")
+
+@app.route('/logout', methods=['POST'])
+def logging_out():
+    session.clear()
+    flash(" 🔒 You have been logged out. 👋")
+    return redirect('/')
 
 
 if __name__ == '__main__':

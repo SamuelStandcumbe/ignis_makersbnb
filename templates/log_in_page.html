@@ -16,7 +16,10 @@
         <main>
             <div class="card">
                 <h2>Log in to MakersBnB</h2>
-                <form method="POST" action="/sessions">
+                {% for message in get_flashed_messages() %}
+                <p style="color: red;"> {{message}} </p>
+        {% endfor %}
+        <form method="POST" action="/sessions">
                     <label for="email">Email Address</label>
                     <input type="text" id="email" name="email" placeholder="example@example.com" required><br>
 
@@ -26,6 +29,7 @@
                     <input type="submit" value="Log In">
                 </form>
             </div>
-        </main>
+            <h3> Don't have an account? <a href="/" style="color: rgb(61, 61, 251); text-decoration: underline;">Sign up here</a>.</h3>
+</main>
     </body>
 </html>

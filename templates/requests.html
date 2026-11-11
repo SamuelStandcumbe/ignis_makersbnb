@@ -12,7 +12,9 @@
             <nav>
                 <a class="navigation" href="/spaces">Spaces</a>
                 <a class="navigation current-page" href="/requests">Requests</a>
-                <a class="navigation" href="/login">Sign Out</a>
+                <form action="/logout" method="POST" style="display: inline; margin:0; padding: 0;">
+                    <button type="submit" class="navigation">Log Out</button>
+                </form>
             </nav>
         </header>
 
