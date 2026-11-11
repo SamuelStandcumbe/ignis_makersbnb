@@ -4,7 +4,7 @@ DROP TABLE IF EXISTS users;
 
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
-    username VARCHAR(255) NOT NULL,
+    full_name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     host BOOLEAN NOT NULL
@@ -31,8 +31,8 @@ CREATE TABLE requests (
     CONSTRAINT fk_host FOREIGN KEY (host_id) REFERENCES users(id) ON DELETE CASCADE
     );
 
-INSERT INTO users (username, email, password, host) VALUES ('Alice Example', 'alice@example.com', 'password123', TRUE);
-INSERT INTO users (username, email, password, host) VALUES ('Bob Example', 'bob@example.com', 'password456', FALSE);
+INSERT INTO users (full_name, email, password, host) VALUES ('Alice Example', 'alice@example.com', 'password123', TRUE);
+INSERT INTO users (full_name, email, password, host) VALUES ('Bob Example', 'bob@example.com', 'password456', FALSE);
 
 INSERT INTO spaces (space_name, location, description, price, user_id) VALUES ('Fisherman''s cottage by the harbour', 'Whitstable, Kent', 'Compact studio with a double bed, kitchenette and fast wifi. Five minutes from Shoreditch High Street station.' , 95, 1);
 INSERT INTO spaces (space_name, location, description, price, user_id) VALUES ('Stone barn in the Peak District', 'Edale, Derbyshire', 'Converted barn at the start of the Pennine Way. Boot room, drying rack and a big kitchen table.', 140, 1);
