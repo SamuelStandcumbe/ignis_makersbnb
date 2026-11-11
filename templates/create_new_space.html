@@ -1,36 +1,46 @@
 <!DOCTYPE html>
-<html>
-<head>
-<title>List a Space - MakersBnB</title>
-<link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css">
-</head>
-<body>
-<main>
-<h1>List a Space</h1>
+<html lang="en-GB">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Makers BnB</title>
+        <link rel="stylesheet" href="/static/css/styles.css">
+    </head>
+    <body>
+        <header>
+            <img id="logo" src="/static/images/makers-bnb-light-mode-logo.png">
+            <nav>
+                <a class="navigation current-page">Spaces</a>
+                <a class="navigation" href="/requests">Requests</a>
+                <a class="navigation" href="/login">Sign Out</a>
+            </nav>
+        </header>
+        <main>
+            <h1>List a Space</h1>
 
-{% if errors %}
-    <ul class="errors">
-    {% for error in errors %}
-        <li>{{ error }}</li>
-    {% endfor %}
-    </ul>
-{% endif %}
+            {% if errors %}
+                <ul class="errors">
+                {% for error in errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
 
-<form action="/spaces" method="POST">
-    <label for="space_name">Name</label>
-    <input type="text" id="space_name" name="space_name" maxlength="255" value="{{ form.get('space_name', '') }}">
+            <form action="/spaces" method="POST">
+                <label for="space_name">Name</label>
+                <input type="text" id="space_name" name="space_name" maxlength="255" value="{{ form.get('space_name', '') }}">
 
-    <label for="location">Location</label>
-    <input type="text" id="location" name="location" maxlength="255" value="{{ form.get('location', '') }}">
+                <label for="location">Location</label>
+                <input type="text" id="location" name="location" maxlength="255" value="{{ form.get('location', '') }}">
 
-    <label for="description">Description</label>
-    <textarea id="description" name="description" maxlength="255">{{ form.get('description', '') }}</textarea>
+                <label for="description">Description</label>
+                <textarea id="description" name="description" maxlength="255">{{ form.get('description', '') }}</textarea>
 
-    <label for="price">Price per night (£)</label>
-    <input type="number" id="price" name="price" step="0.01" min="0" value="{{ form.get('price', '') }}">
+                <label for="price">Price per night (£)</label>
+                <input type="number" id="price" name="price" step="0.01" min="0" value="{{ form.get('price', '') }}">
 
-    <input type="submit" value="List my space">
-</form>
-</main>
-</body>
+                <input type="submit" value="List my space">
+            </form>
+        </main>
+    </body>
 </html>

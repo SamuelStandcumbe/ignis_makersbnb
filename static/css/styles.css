@@ -1,0 +1,417 @@
+
+/* ========================================
+    1. CSS RESET & GLOBAL STYLES
+======================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+}
+
+body {
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+    background-color: #FFFFFF;
+    color: #190D22;
+}
+
+
+/* ========================================
+    2. HEADER & NAVIGATION
+======================================== */
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem 2rem;
+}
+
+#logo {
+    display: block;
+    width: 25%;
+    max-width: 300px;
+    height: auto;
+}
+
+.navigation {
+    display: inline-block;
+    border: 1px solid #6000BC;
+    border-radius: 10px;
+    padding: 0.5rem 0.8rem;
+    margin: 0.5rem;
+    font-size: large;
+    background-color: #6000BC;
+    color: #FFFFFF;
+    text-decoration: none;
+    transition: transform 0.2s ease,
+                background-color 0.2s ease,
+                color 0.2s ease;
+}
+
+.navigation:hover {
+    background-color: #FFFFFF;
+    color: #6000BC;
+    transform: scale(1.05);
+}
+
+.navigation.current-page {
+    background-color: #E6D6FF;
+    color: #6000BC;
+}
+
+
+/* ========================================
+    3. SHARED PAGE COMPONENTS
+======================================== */
+
+/* Intro sections */
+
+.intro {
+    text-align: center;
+    margin: 2rem auto 1rem;
+    padding: 0 1rem;
+}
+
+.intro h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.intro p {
+    color: #6B6472;
+    font-size: 1rem;
+    max-width: 650px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+
+/* General cards */
+
+.card {
+    background-color: #F7F4FF;
+    width: 90%;
+    max-width: 500px;
+    padding: 2rem;
+    border-radius: 15px;
+    margin: 2rem auto;
+}
+
+.card h2 {
+    margin-bottom: 1.5rem;
+}
+
+
+/* ========================================
+    4. SIGNUP & FORM STYLES
+======================================== */
+
+.card label {
+    display: block;
+    margin-bottom: 0.3rem;
+}
+
+.card input:not([type="checkbox"]):not([type="submit"]) {
+    display: block;
+    width: 100%;
+    padding: 0.7rem;
+    border: 1px solid #E6E0EB;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.card input[type="submit"] {
+    width: 100%;
+    background-color: #6000BC;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    padding: 0.8rem 1.5rem;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.card input[type="submit"]:hover {
+    transform: scale(1.05);
+}
+
+.card input:focus-visible {
+    outline: 2px solid #6000BC;
+    outline-offset: 2px;
+}
+
+
+/* ========================================
+    5. AVAILABLE SPACES PAGE
+======================================== */
+
+.space-card {
+    background-color: #F7F4FF;
+    padding: 2rem;
+    border-radius: 15px;
+    max-width: 650px;
+    width: 90%;
+    margin: 1.5rem auto;
+    transition: transform 0.2s ease;
+}
+
+.space-card h3 {
+    margin-bottom: 0.5rem;
+}
+
+.space-card:hover {
+    transform: scale(1.02);
+}
+
+
+/* ========================================
+    6. BOOKING REQUESTS PAGE
+======================================== */
+
+.requests {
+    max-width: 650px;
+    margin: 2rem auto;
+}
+
+.requests h2 {
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+
+/* ========================================
+    7. BOOKING PAGE
+======================================== */
+
+/* Page layout */
+
+.booking-page {
+    max-width: 900px;
+    margin: 3rem auto;
+    padding: 0 1rem 4rem;
+}
+
+
+/* Property information */
+
+.space-details {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.space-details h2 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.space-details h3 {
+    color: #6000BC;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+.space-details p {
+    color: #6B6472;
+    line-height: 1.6;
+    max-width: 650px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+
+/* Calendar navigation */
+
+.booking-page .calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 1.5rem;
+    background-color: #F7F4FF;
+    border-radius: 15px 15px 0 0;
+}
+
+.booking-page .calendar-header h2 {
+    font-size: 1.3rem;
+}
+
+.booking-page .calendar-header a {
+    display: inline-block;
+    color: #6000BC;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-decoration: none;
+    transition: transform 0.2s ease;
+}
+
+.booking-page .calendar-header a:hover {
+    transform: scale(1.2);
+}
+
+
+/* Calendar table */
+
+.booking-page table {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto 2rem;
+    padding: 0 1rem 1.5rem;
+    background-color: #F7F4FF;
+    border-collapse: separate;
+    border-spacing: 4px;
+    border-radius: 0 0 15px 15px;
+    table-layout: fixed;
+}
+
+.booking-page th {
+    padding: 0.75rem 0;
+    color: #6B6472;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.booking-page td {
+    height: 55px;
+    text-align: center;
+    border-radius: 8px;
+    font-size: 0.95rem;
+}
+
+
+/* Available dates */
+.booking-page .available {
+    background-color: #B8EDC9;
+    color: #176B35;
+    font-weight: bold;
+}
+
+.booking-page .available:hover {
+    background-color: #8EDDA8;
+}
+
+/* Unavailable dates */
+.booking-page .unavailable {
+    background-color: #F3A2A2;
+    color: #B80000;
+    font-weight: bold;
+}
+
+/* Past dates */
+.booking-page .past {
+    background-color: #C6C6C6;
+    color: #5D5D5D;
+    font-weight: bold;
+}
+
+/* Dates outside current month */
+.booking-page .other-month {
+    background-color: transparent;
+}
+
+
+/* ========================================
+    8. BOOKING FORM
+======================================== */
+
+.booking-page .booking-form {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 1.5rem;
+    background-color: #F7F4FF;
+    border-radius: 15px;
+    text-align: center;
+}
+
+.booking-page .booking-form h3 {
+    margin-bottom: 1rem;
+}
+
+.booking-page .booking-form input[type="date"] {
+    display: block;
+    width: 100%;
+    padding: 0.8rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #E6E0EB;
+    border-radius: 8px;
+    background-color: #FFFFFF;
+    color: #190D22;
+    font: inherit;
+}
+
+.booking-page .booking-form button {
+    width: 100%;
+    padding: 0.8rem 1.5rem;
+    background-color: #6000BC;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    font: inherit;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.booking-page .booking-form button:hover {
+    transform: scale(1.03);
+}
+
+
+/* ========================================
+    9. RESPONSIVE STYLES
+======================================== */
+
+@media (max-width: 600px) {
+
+    header {
+        flex-direction: column;
+        padding: 1rem;
+    }
+
+    #logo {
+        width: 70%;
+        max-width: 250px;
+    }
+
+    nav {
+        text-align: center;
+    }
+
+    .navigation {
+        font-size: 0.9rem;
+        margin: 0.25rem;
+    }
+
+    .booking-page {
+        margin: 2rem auto;
+    }
+
+    .space-details h2 {
+        font-size: 1.5rem;
+    }
+
+    .booking-page .calendar-header {
+        padding: 1rem;
+    }
+
+    .booking-page table {
+        padding: 0 0.25rem 1rem;
+        border-spacing: 2px;
+    }
+
+    .booking-page td {
+        height: 40px;
+        font-size: 0.85rem;
+    }
+
+    .card,
+    .space-card {
+        padding: 1.5rem;
+    }
+}
