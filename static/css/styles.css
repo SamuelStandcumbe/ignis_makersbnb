@@ -161,6 +161,7 @@ header {
     width: 90%;
     margin: 1.5rem auto;
     transition: transform 0.2s ease;
+
 }
 
 .space-card h3 {
@@ -169,6 +170,10 @@ header {
 
 .space-card:hover {
     transform: scale(1.02);
+}
+
+.spaces a:link {
+    text-decoration: none;
 }
 
 
