@@ -25,4 +25,4 @@ class UserRepository():
             return None
         else:
             user_details = rows[0]
-        return User (user_details["username"], user_details["email"], user_details["password"], user_details["host"], user_details["id"] )
+        return User (user_details["full_name"], user_details["email"], user_details["password"], user_details["host"], user_details["id"] )
