@@ -3,7 +3,7 @@ import os
 import calendar
 import psycopg
 from datetime import date, timedelta
-from flask import Flask, render_template, request, redirect, session
+from flask import Flask, render_template, request, redirect, session, flash
 from database_connection import DatabaseConnection, get_flask_database_connection
 from lib.space import Space
 from lib.space_repository import SpaceRepository
@@ -32,6 +32,25 @@ def get_sign_up():
 @app.route('/login', methods=['GET'])
 def get_log_in():
     return render_template("log_in_page.html")
+
+@app.route('/sessions', methods=['POST'])
+def create_sessions():
+    connection = DatabaseConnection()
+    connection.connect()
+    user_repository = UserRepository(connection)
+
+    email_address = request.form["email"]
+    password = request.form["password"]
+
+    user = user_repository.find_by_email_address(email_address)
+    if user is not None  and user.password == password:
+        session["user_id"] = user.id
+        session["email"] = user.email
+        return redirect("/spaces")
+    else:
+        flash("Invalid Email Address or Password.")
+        return redirect("/login")
+
 
 # To view a list of all available spaces
 @app.route('/spaces', methods=['GET'])

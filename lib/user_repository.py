@@ -18,3 +18,11 @@ class UserRepository():
             [user.username, user.email, user.password, user.host]
         )
         return None
+
+    def find_by_email_address(self, email_address):
+        rows = self._connection.execute('SELECT * FROM users WHERE email = %s', [email_address])
+        if not rows:
+            return None
+        else:
+            user_details = rows[0]
+        return User (user_details["username"], user_details["email"], user_details["password"], user_details["host"], user_details["id"] )

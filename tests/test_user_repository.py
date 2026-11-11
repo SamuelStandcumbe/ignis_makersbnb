@@ -16,3 +16,11 @@ def test_create_adds_user(db_connection):
     repo = UserRepository(db_connection)
     repo.create(User("carol", "carol@gmail.com", "Password234", False, 3))
     assert repo.all()[-1] == User("carol", "carol@gmail.com", "Password234", False, 3)
+
+
+# test finds a user using its email address
+def test_find_user_by_email(db_connection):
+    db_connection.seed("seeds/ignis_makersbnb.sql")
+    repo = UserRepository(db_connection)
+    result = repo.find_by_email_address("alice@example.com")
+    assert result == User ("Alice Example", "alice@example.com", "password123", True, 1)
