@@ -21,15 +21,24 @@
             <section>
                 <h2 class="requests">Requests I've received</h2>
                 {% for request in requests %}
-                <article class="card">
-                    <h3>Cosy Cottage in the Cotswolds</h3>
-                    <p>
-                        Requested dates:
-                        <time datetime="{{ request.requested_date }}">
-                            {{ request.requested_date }}
-                        </time>
-                    </p>
-                </article>
+                    {% for space in spaces %}
+                        {% if space.id == request.space_id %}
+                            <article class="card">
+                                <h3>{{space.space_name}}</h3>
+                                <p>
+                                Status: {% if request.approved == True %} Approved {% endif%}
+                                {% if request.approved == False %} Pending {% endif%}<br>
+                                Requested dates:
+                                <time datetime="{{ request.requested_date }}">
+                                    {{ request.requested_date }}
+                                </time><br>
+                                <form method="POST" action="/requests/{{request.host_id}}/{{request.id}}/approve"><button>Accept Request</button></form>
+                                <form method="POST" action="/requests/{{request.host_id}}/{{request.id}}/reject"><button>Decline Request</button></form>
+                                
+                            </p>
+                        </article>
+                        {% endif %}
+                    {% endfor %}
                 {% endfor %}
             </section>
         </main>

@@ -23,7 +23,6 @@ def get_connection():
     connection.connect()
     return connection
 
-
 # View landing / signup page
 @app.route('/', methods=['GET'])
 def get_sign_up():
@@ -123,7 +122,7 @@ def get_booking_page(id):
 
 # To view requests recieved by a space owner
 # Scope to turn this into a .find with user ID when logged in.
-@app.route('/requests/<user_id>', methods=['GET'])
+@app.route('/requests/<user_id>', methods=['GET', 'POST'])
 def get_requests(user_id):
     repo = RequestRepository(get_connection())
     requests = repo.find_by_user(user_id)
@@ -133,6 +132,17 @@ def get_requests(user_id):
                             requests= requests,
                             spaces = spaces)
 
+@app.route('/requests/<user_id>/<request_id>/reject', methods=['POST'])
+def post_request_declined(user_id, request_id):
+    repo = RequestRepository(get_connection())
+    repo.reject_request(request_id)
+    return redirect(f"/requests/{user_id}")
+
+@app.route('/requests/<user_id>/<request_id>/approve', methods=['POST'])
+def post_request_approved(user_id, request_id):
+    repo = RequestRepository(get_connection())
+    repo.approve_request(request_id)
+    return redirect(f"/requests/{user_id}")
 
 # View requests you have made on spaces
 @app.route('/view_requests', methods=['GET'])
