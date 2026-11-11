@@ -50,7 +50,7 @@ def create_sessions():
         session["email"] = user.email
         return redirect("/spaces")
     else:
-        flash("Invalid Email Address or Password.")
+        flash("⚠️ Invalid Email Address or Password! ")
         return redirect("/login")
 
 
@@ -180,6 +180,12 @@ def post_users():
     )
     repo.create(user)
     return redirect("/login")
+
+@app.route('/logout', methods=['POST'])
+def logging_out():
+    session.clear()
+    flash(" 🔒 You have been logged out. 👋")
+    return redirect('/')
 
 
 if __name__ == '__main__':

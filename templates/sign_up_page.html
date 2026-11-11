@@ -16,6 +16,9 @@
     <p>Introductory blurb text</p>
     <div>
         <h2>Sign up to MakersBnB</h2>
+        {% for message in get_flashed_messages() %}
+        <p style="color: red;"> {{message}} </p>
+        {% endfor %}
         <form method="POST" action="/users">
             <label for="username">Username</label>
             <input type="text" id="username" name="username" placeholder="Username" required><br>

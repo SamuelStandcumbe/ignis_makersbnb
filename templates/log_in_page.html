@@ -15,7 +15,7 @@
     <div>
         <h2>Log in to MakersBnB</h2>
         {% for message in get_flashed_messages() %}
-        <p style="color: red;"> ⚠️ Invalid Email Address or Password! </p>
+        <p style="color: red;"> {{message}} </p>
         {% endfor %}
         <form method="POST" action="/sessions">
             <label for="email">Email Address</label>
