@@ -10,6 +10,8 @@ from lib.space_repository import SpaceRepository
 from lib.request_repository import RequestRepository
 from lib.user import User
 from lib.user_repository import UserRepository
+from lib.request import Request
+from lib.request_repository import RequestRepository
 
 
 app = Flask(__name__)
@@ -119,11 +121,17 @@ def get_booking_page(id):
         space_description=space.description
     )
 
-
-# View requests received by a space owner
-@app.route('/requests', methods=['GET'])
-def get_requests():
-    return render_template("requests.html")
+# To view requests recieved by a space owner
+# Scope to turn this into a .find with user ID when logged in.
+@app.route('/requests/<user_id>', methods=['GET'])
+def get_requests(user_id):
+    repo = RequestRepository(get_connection())
+    requests = repo.find_by_user(user_id)
+    space_repo = SpaceRepository(get_connection())
+    spaces = space_repo.find_by_user(user_id)
+    return render_template("requests.html",
+                            requests= requests,
+                            spaces = spaces)
 
 
 # View requests you have made on spaces

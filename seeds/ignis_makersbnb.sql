@@ -25,8 +25,10 @@ CREATE TABLE requests (
     user_id INTEGER NOT NULL,
     approved BOOLEAN NOT NULL DEFAULT FALSE,
     requested_date DATE NOT NULL,
+    host_id INTEGER NOT NULL,
     CONSTRAINT fk_space FOREIGN KEY (space_id) REFERENCES spaces(id) ON DELETE CASCADE,
-    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_host FOREIGN KEY (host_id) REFERENCES users(id) ON DELETE CASCADE
     );
 
 INSERT INTO users (username, email, password, host) VALUES ('Alice Example', 'alice@example.com', 'password123', TRUE);
@@ -36,6 +38,6 @@ INSERT INTO spaces (space_name, location, description, price, user_id) VALUES ('
 INSERT INTO spaces (space_name, location, description, price, user_id) VALUES ('Stone barn in the Peak District', 'Edale, Derbyshire', 'Converted barn at the start of the Pennine Way. Boot room, drying rack and a big kitchen table.', 140, 1);
 INSERT INTO spaces (space_name, location, description, price, user_id) VALUES ('Bright studio near Brick Lane', 'Shoreditch, London', 'Compact studio with a double bed, kitchenette and fast wifi. Five minutes from Shoreditch High Street station.', 120, 1);
 
-INSERT INTO requests (space_id, user_id, approved, requested_date) VALUES (1, 2, FALSE, '2026-10-10');
-INSERT INTO requests (space_id, user_id, approved, requested_date) VALUES (2, 2, TRUE, '2026-11-28');
-INSERT INTO requests (space_id, user_id, approved, requested_date) VALUES (2, 2, TRUE, '2026-11-25');
+INSERT INTO requests (space_id, user_id, approved, requested_date, host_id) VALUES (1, 2, FALSE, '2026-10-10', 1);
+INSERT INTO requests (space_id, user_id, approved, requested_date, host_id) VALUES (2, 2, TRUE, '2026-11-28', 1);
+INSERT INTO requests (space_id, user_id, approved, requested_date, host_id) VALUES (2, 2, TRUE, '2026-11-25', 1);
