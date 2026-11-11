@@ -127,8 +127,11 @@ def get_booking_page(id):
 def get_requests(user_id):
     repo = RequestRepository(get_connection())
     requests = repo.find_by_user(user_id)
+    space_repo = SpaceRepository(get_connection())
+    spaces = space_repo.find_by_user(user_id)
     return render_template("requests.html",
-                            requests= requests)
+                            requests= requests,
+                            spaces = spaces)
 
 
 # View requests you have made on spaces
