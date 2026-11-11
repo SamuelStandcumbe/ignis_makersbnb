@@ -1,4 +1,3 @@
-
 import os
 import calendar
 import psycopg
@@ -10,9 +9,6 @@ from lib.space_repository import SpaceRepository
 from lib.request_repository import RequestRepository
 from lib.user import User
 from lib.user_repository import UserRepository
-from lib.request import Request
-from lib.request_repository import RequestRepository
-
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "dev-secret-change-me")
@@ -22,7 +18,6 @@ def get_connection():
     connection = DatabaseConnection(test_mode=app.config.get("TESTING", False))
     connection.connect()
     return connection
-
 
 # View landing / signup page
 @app.route('/', methods=['GET'])
@@ -34,12 +29,6 @@ def get_sign_up():
 @app.route('/login', methods=['GET'])
 def get_log_in():
     return render_template("log_in_page.html")
-
-# To view a list of all available spaces
-@app.route('/spaces', methods=['GET'])
-def get_available_spaces():
-    return render_template("available_spaces.html")
-
 
 # View form to create a new space (logged-in users only)
 @app.route('/spaces/new', methods=['GET'])
@@ -125,7 +114,6 @@ def get_booking_page(id):
 @app.route('/requests', methods=['GET'])
 def get_requests():
     user_id = 1  # Temporary until login is implemented
-
     connection = get_flask_database_connection(app)
 
     request_repo = RequestRepository(connection)
@@ -142,6 +130,19 @@ def get_requests():
         sent_requests=sent_requests,
         spaces_by_id=spaces_by_id
     )
+
+@app.route('/requests/<user_id>/<request_id>/reject', methods=['POST'])
+def post_request_declined(user_id, request_id):
+    repo = RequestRepository(get_connection())
+    repo.reject_request(request_id)
+    return redirect("/requests")
+
+
+@app.route('/requests/<user_id>/<request_id>/approve', methods=['POST'])
+def post_request_approved(user_id, request_id):
+    repo = RequestRepository(get_connection())
+    repo.approve_request(request_id)
+    return redirect("/requests")
 
 # To view a list of all available spaces
 @app.route('/spaces', methods=['GET'])

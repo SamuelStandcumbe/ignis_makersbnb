@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en-GB">
     <head>
@@ -16,6 +15,7 @@
                 <a class="navigation" href="/login">Sign Out</a>
             </nav>
         </header>
+
         <main>
             <h1 class="intro">Booking requests</h1>
 
@@ -45,6 +45,16 @@
                             Pending
                         {% endif %}
                     </p>
+
+                    {% if not request.approved %}
+                    <form method="POST" action="/requests/{{ request.host_id }}/{{ request.id }}/approve">
+                        <button type="submit">Accept Request</button>
+                    </form>
+
+                    <form method="POST" action="/requests/{{ request.host_id }}/{{ request.id }}/reject">
+                        <button type="submit">Decline Request</button>
+                    </form>
+                    {% endif %}
                 </article>
                 {% else %}
                 <p>You haven't received any booking requests yet.</p>
