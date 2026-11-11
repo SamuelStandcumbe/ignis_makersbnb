@@ -11,7 +11,15 @@ class RequestRepository:
             'SELECT * FROM requests WHERE space_id = %s AND approved = TRUE ORDER BY start_date' , [space_id])
         unavailable_dates = []
         for row in rows:
-            request = Request(row["id"], row["space_id"], row["user_id"], row["approved"], row["start_date"], row["end_date"])
+            request = Request(
+                row["space_id"],
+                row["user_id"],
+                row["approved"],
+                row["start_date"],
+                row["end_date"],
+                row["host_id"],
+                row["id"]
+            )
             unavailable_dates.extend(request.dates())
         return unavailable_dates
 
@@ -34,6 +42,18 @@ class RequestRepository:
 
     def find_by_user(self, user_id):
         rows = self._connection.execute(
-            "SELECT * FROM requests WHERE host_id = %s ORDER BY id", [user_id]
+            "SELECT * FROM requests WHERE host_id = %s ORDER BY id",
+            [user_id]
         )
-        return [Request(row["space_id"], row["user_id"], row["approved"], row["requested_date"], row["host_id"], row["id"]) for row in rows]
+        return [
+            Request(
+                row["space_id"],
+                row["user_id"],
+                row["approved"],
+                row["start_date"],
+                row["end_date"],
+                row["host_id"],
+                row["id"]
+            )
+            for row in rows
+        ]
