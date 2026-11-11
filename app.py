@@ -33,8 +33,7 @@ def get_sign_up():
 def get_log_in():
     return render_template("log_in_page.html")
 
-
-# View a list of all available spaces
+# To view a list of all available spaces
 @app.route('/spaces', methods=['GET'])
 def get_available_spaces():
     return render_template("available_spaces.html")
@@ -55,12 +54,12 @@ def create_space():
         return redirect("/login")
 
     space = Space(
-        None,
         request.form.get("space_name", "").strip(),
         request.form.get("location", "").strip(),
         request.form.get("description", "").strip(),
         request.form.get("price", "").strip(),
         session["user_id"],
+        None,
     )
 
     if not space.is_valid():
@@ -131,6 +130,15 @@ def get_requests():
 @app.route('/view_requests', methods=['GET'])
 def get_requests_made():
     return render_template("view_requests.html")
+
+# To view a list of all available spaces
+@app.route('/spaces', methods=['GET'])
+def get_all_available_spaces():
+    connection = DatabaseConnection()
+    connection.connect()
+    available_spaces_repository = SpaceRepository(connection)
+    available_spaces = available_spaces_repository.all()
+    return render_template("available_spaces.html", available_spaces = available_spaces)
 
 
 # Receive signup form and save new user
