@@ -1,9 +1,15 @@
 from lib.space import Space
-
-
 class SpaceRepository:
     def __init__(self, connection):
         self._connection = connection
+
+    def all(self):
+        rows = self._connection.execute('SELECT * FROM spaces')
+        available_spaces = []
+        for row in rows:
+            item = Space(row['space_name'], row['location'], row['description'], row['price'], row['user_id'], row['id'])
+            available_spaces.append(item)
+        return available_spaces
 
     def find_by_space_id(self, space_id):
         rows = self._connection.execute(
@@ -13,12 +19,12 @@ class SpaceRepository:
         if rows:
             row = rows[0]
             return Space(
-                row["id"],
                 row["space_name"],
                 row["location"],
                 row["description"],
                 row["price"],
-                row["user_id"]
+                row["user_id"],
+                row["id"]
             )
         else:
             return None
@@ -27,18 +33,8 @@ class SpaceRepository:
         rows = self._connection.execute(
             "SELECT * FROM spaces WHERE user_id = %s ORDER BY id", [user_id]
         )
-
-        return [
-            Space(
-                row["id"],
-                row["space_name"],
-                row["location"],
-                row["description"],
-                row["price"],
-                row["user_id"]
-            )
-            for row in rows
-        ]
+        return [Space(row["space_name"], row["location"], row["description"],
+                    row["price"], row["user_id"], row["id"]) for row in rows]
 
     def create(self, space):
         rows = self._connection.execute(

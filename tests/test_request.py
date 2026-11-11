@@ -1,18 +1,27 @@
 from lib.request import Request
 
-def test_request_init_with_properties():
-    request = Request(1, 1, 2, True, '2026-10-10')
-    assert request.id == 1
+#test that request instances with the correct variables
+def test_request_instancing():
+    request = Request(1, 2, False, '2026-10-10', 1)
     assert request.space_id == 1
     assert request.user_id == 2
-    assert request.approved == True
+    assert request.approved is False
     assert request.requested_date == '2026-10-10'
+    assert request.host_id == 1
+    assert request.id is None
 
-def test_equality():
-    request1 = Request(1, 1, 2, True, '2026-10-10')
-    request2 = Request(1, 1, 2, True, '2026-10-10')
-    assert request1 == request2
+#test that request can instance when given an id
+def test_request_instancing_with_id():
+    request = Request(1, 2, False, '2026-10-10', 1, 1)
+    assert request.id == 1
 
-def test_formats_nicely():
-    request = Request(1, 1, 2, True, '2026-10-10')
-    assert str(request) == "Request(1, 1, 2, True, 2026-10-10)"
+#test two users with identical attributes are equal
+def test_requestss_are_equal_when_attributes_match():
+    a = Request(1, 2, False, '2026-10-10', 1)
+    b = Request(1, 2, False, '2026-10-10', 1)
+    assert a == b
+
+#test readable string format
+def test_requests_repr():
+    request = Request(1, 2, False, '2026-10-10', 1, 1)
+    assert repr(request) == "Request(1, 2, False, 2026-10-10, 1, 1)"
