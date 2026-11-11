@@ -24,6 +24,7 @@ CREATE TABLE requests (
     space_id INTEGER NOT NULL,
     user_id INTEGER NOT NULL,
     approved BOOLEAN NOT NULL DEFAULT FALSE,
+    host_id INTEGER NOT NULL,
     start_date DATE NOT NULL,
     end_date DATE NOT NULL,
     CONSTRAINT fk_space FOREIGN KEY (space_id) REFERENCES spaces(id) ON DELETE CASCADE,

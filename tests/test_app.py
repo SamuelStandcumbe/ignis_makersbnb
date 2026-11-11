@@ -29,7 +29,7 @@ def test_get_available_spaces_returns_200(client):
 
 
 def test_get_requests_returns_200(client):
-    response = client.get("/requests")
+    response = client.get("/requests/1")
     assert response.status_code == 200
 
 

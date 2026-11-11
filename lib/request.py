@@ -1,13 +1,14 @@
 from datetime import timedelta
 
 class Request:
-    def __init__(self, id, space_id, user_id, approved, start_date, end_date):
+    def __init__(self, space_id, user_id, approved, start_date, end_date, host_id, id=None):
         self.id = id
         self.space_id = space_id
         self.user_id = user_id
         self.approved = approved
         self.start_date = start_date
         self.end_date = end_date
+        self.host_id = host_id
 
     # function to error if date range isnt valid
     def generate_errors(self):
@@ -29,4 +30,4 @@ class Request:
         return self.__dict__ == other.__dict__
 
     def __repr__(self):
-        return f"Request({self.id}, {self.space_id}, {self.user_id}, {self.approved}, {self.start_date}, {self.end_date})"
+        return f"Request({self.space_id}, {self.user_id}, {self.approved}, {self.start_date}, {self.end_date}, {self.host_id}, {self.id})"

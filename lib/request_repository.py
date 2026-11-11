@@ -22,3 +22,18 @@ class RequestRepository:
             'AND start_date <= %s AND end_date >= %s',
             [space_id, end_date, start_date])
         return len(rows) > 0 #only returns true if there is overlap - otherwise False
+    def approve_request(self, request_id):
+        self._connection.execute(
+            "UPDATE requests SET approved = True WHERE id = %s;", [request_id]
+        )
+
+    def reject_request(self, request_id):
+        self._connection.execute(
+            "DELETE FROM requests WHERE id = %s;", [request_id]
+        )
+
+    def find_by_user(self, user_id):
+        rows = self._connection.execute(
+            "SELECT * FROM requests WHERE host_id = %s ORDER BY id", [user_id]
+        )
+        return [Request(row["space_id"], row["user_id"], row["approved"], row["requested_date"], row["host_id"], row["id"]) for row in rows]
