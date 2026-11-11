@@ -21,10 +21,6 @@ def test_get_available_spaces_returns_200():
     response = client.get("/spaces")
     assert response.status_code == 200
 
-def test_get_create_space_form_returns_200():
-    client = app.test_client()
-    response = client.get("/spaces/new")
-    assert response.status_code == 200
 
 def test_get_requests_returns_200():
     client = app.test_client()

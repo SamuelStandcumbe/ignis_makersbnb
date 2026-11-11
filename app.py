@@ -1,13 +1,17 @@
-from flask import Flask, render_template, request, redirect 
+import os
 import calendar
-from lib.space_repository import *
-from lib.space import*
-from database_connection import DatabaseConnection
+import psycopg
+from flask import Flask, render_template, request, redirect, session
+from database_connection import DatabaseConnection, get_flask_database_connection
+from lib.space import Space
+from lib.space_repository import SpaceRepository
 #User imports
 from lib.user import User
 from lib.user_repository import UserRepository
 
 app = Flask(__name__)
+app.secret_key = os.getenv("SECRET_KEY", "dev-secret-change-me")
+
 
 def get_connection():
     connection = DatabaseConnection(test_mode=app.config.get("TESTING", False))
@@ -25,10 +29,39 @@ def get_log_in():
     return render_template("log_in_page.html")
 
 
-# To view a form to create a new space.
+# To view a form to create a new space (logged-in users only)
 @app.route('/spaces/new', methods=['GET'])
 def get_create_space_form():
-    return render_template("create_new_space.html")
+    if "user_id" not in session:
+        return redirect("/login")
+    return render_template("create_new_space.html", errors=[], form={})
+
+# Save a new space for the logged-in user
+@app.route('/spaces', methods=['POST'])
+def create_space():
+    if "user_id" not in session:
+        return redirect("/login")
+    space = Space(
+        request.form.get("space_name", "").strip(),
+        request.form.get("location", "").strip(),
+        request.form.get("description", "").strip(),
+        request.form.get("price", "").strip(),
+        session["user_id"],
+        None,
+    )
+
+    if not space.is_valid():
+        return render_template("create_new_space.html",
+                            errors=space.generate_errors(), form=request.form), 400
+
+    try:
+        SpaceRepository(get_flask_database_connection(app)).create(space)
+    except psycopg.Error:
+        return render_template("create_new_space.html",
+                            errors=["Sorry, we could not save your space. Please try again."],
+                            form=request.form), 500
+
+    return redirect("/spaces")
 
 # To view available dates for a specific property
 # Scope to turn this into a .find with space ID in future
