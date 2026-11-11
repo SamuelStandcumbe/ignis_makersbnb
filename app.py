@@ -33,6 +33,9 @@ def get_sign_up():
 # View form for login
 @app.route('/login', methods=['GET'])
 def get_log_in():
+    if 'user_id' in session:
+        return redirect('/spaces')
+    
     return render_template("log_in_page.html")
 
 @app.route('/sessions', methods=['POST'])
