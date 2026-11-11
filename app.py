@@ -1,15 +1,18 @@
+
 import os
 import calendar
 import psycopg
+from datetime import date, timedelta
 from flask import Flask, render_template, request, redirect, session
 from database_connection import DatabaseConnection, get_flask_database_connection
 from lib.space import Space
 from lib.space_repository import SpaceRepository
-#User imports
+from lib.request_repository import RequestRepository
 from lib.user import User
 from lib.user_repository import UserRepository
 from lib.request import Request
 from lib.request_repository import RequestRepository
+
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "dev-secret-change-me")
@@ -20,12 +23,14 @@ def get_connection():
     connection.connect()
     return connection
 
-#  View landing/ signup page
+
+# View landing / signup page
 @app.route('/', methods=['GET'])
 def get_sign_up():
     return render_template("sign_up_page.html")
 
-# View Form for Login
+
+# View form for login
 @app.route('/login', methods=['GET'])
 def get_log_in():
     return render_template("log_in_page.html")
@@ -35,58 +40,85 @@ def get_log_in():
 def get_available_spaces():
     return render_template("available_spaces.html")
 
-# To view a form to create a new space (logged-in users only)
+
+# View form to create a new space (logged-in users only)
 @app.route('/spaces/new', methods=['GET'])
 def get_create_space_form():
     if "user_id" not in session:
         return redirect("/login")
     return render_template("create_new_space.html", errors=[], form={})
 
+
 # Save a new space for the logged-in user
 @app.route('/spaces', methods=['POST'])
 def create_space():
     if "user_id" not in session:
         return redirect("/login")
+
     space = Space(
-        None,
         request.form.get("space_name", "").strip(),
         request.form.get("location", "").strip(),
         request.form.get("description", "").strip(),
         request.form.get("price", "").strip(),
         session["user_id"],
+        None,
     )
 
     if not space.is_valid():
-        return render_template("create_new_space.html",
-                            errors=space.generate_errors(), form=request.form), 400
+        return render_template(
+            "create_new_space.html",
+            errors=space.generate_errors(),
+            form=request.form
+        ), 400
 
     try:
         SpaceRepository(get_flask_database_connection(app)).create(space)
     except psycopg.Error:
-        return render_template("create_new_space.html",
-                            errors=["Sorry, we could not save your space. Please try again."],
-                            form=request.form), 500
+        return render_template(
+            "create_new_space.html",
+            errors=["Sorry, we could not save your space. Please try again."],
+            form=request.form
+        ), 500
 
     return redirect("/spaces")
 
-# To view available dates for a specific property
-# Scope to turn this into a .find with space ID in future
-# EG : /spaces/<space_id>
-@app.route('/make_booking')
-def show_calendar():
-    year = 2026
-    month = 11
 
-    weeks = calendar.monthcalendar(year, month)
+# View available dates for a specific property
+@app.route('/make_request/<id>', methods=["GET"])
+def get_booking_page(id):
+    connection = get_flask_database_connection(app)
 
-    available_dates = [10, 12, 17, 19, 24, 26]
+    space_repository = SpaceRepository(connection)
+    space = space_repository.find_by_space_id(id)
+
+    request_repository = RequestRepository(connection)
+    unavailable_dates = request_repository.find_unavailable_dates_by_space_id(id)
+
+    today = date.today()
+    year = int(request.args.get('year', today.year))
+    month = int(request.args.get('month', today.month))
+
+    first_day = date(year, month, 1)
+
+    previous_month = first_day - timedelta(days=1)
+    next_month = first_day + timedelta(days=calendar.monthrange(year, month)[1])
+
+    weeks = calendar.Calendar().monthdatescalendar(year, month)
 
     return render_template(
-        'make_booking.html',
+        'make_request.html',
         weeks=weeks,
-        available_dates=available_dates,
+        unavailable_dates=unavailable_dates,
         month_name=calendar.month_name[month],
-        year=year
+        year=year,
+        today=today,
+        month=month,
+        previous_month=previous_month,
+        next_month=next_month,
+        space_name=space.space_name,
+        space_location=space.location,
+        space_price=space.price,
+        space_description=space.description
     )
 
 # To view requests recieved by a space owner
@@ -98,13 +130,23 @@ def get_requests(user_id):
     return render_template("requests.html",
                             requests= requests)
 
-# To view requests you as a user have made on spaces for a specific date
-# Scope to work specifically with log in.
+
+# View requests you have made on spaces
 @app.route('/view_requests', methods=['GET'])
 def get_requests_made():
     return render_template("view_requests.html")
 
-#receive signup form and save new user - then redirects to /login
+# To view a list of all available spaces
+@app.route('/spaces', methods=['GET'])
+def get_all_available_spaces():
+    connection = DatabaseConnection()
+    connection.connect()
+    available_spaces_repository = SpaceRepository(connection)
+    available_spaces = available_spaces_repository.all()
+    return render_template("available_spaces.html", available_spaces = available_spaces)
+
+
+# Receive signup form and save new user
 @app.route('/users', methods=['POST'])
 def post_users():
     repo = UserRepository(get_connection())
@@ -116,8 +158,6 @@ def post_users():
     )
     repo.create(user)
     return redirect("/login")
-
-
 
 
 if __name__ == '__main__':

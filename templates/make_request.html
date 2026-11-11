@@ -11,16 +11,27 @@
             <h1>Makers BnB</h1>
             <nav>
                 <a>Spaces</a>
-                <a>Bookings</a>
+                <a>Requests</a>
                 <a>Sign Out</a>
             </nav>
         </header>
         <main>
-            <h2>Name of Space</h2>
-            <p>Description of space</p>
+            <h2>Book {{ space_name }} today!</h2>
+            <h3>In {{ space_location }} for £{{ space_price }} per night</h3>
+            <p>{{ space_description }}</p>
             
-            <h2>{{ month_name }} {{ year }}</h2>
-            
+            <div class="calendar-header">
+                <a href="{{ url_for('get_booking_page', id=request.view_args.id, year=previous_month.year, month=previous_month.month) }}">
+                    &larr;
+                </a>
+
+                <h2>{{ month_name }} {{ year }}</h2>
+
+                <a href="{{ url_for('get_booking_page', id=request.view_args.id, year=next_month.year, month=next_month.month) }}">
+                    &rarr;
+                </a>
+            </div>
+
             <table>
                 <thead>
                     <tr>
@@ -38,16 +49,15 @@
                     {% for week in weeks %}
                     <tr>
                         {% for day in week %}
-                        
-                            {% if day == 0 %}
-                            <td></td>
-                        
-                            {% elif day in available_dates %}
-                            <td class="available">{{ day }}</td>
-                        
+
+                            {% if day.month != month %}
+                                <td class="other-month"></td>
+                            {% elif day < today %}
+                                <td class="past">{{ day.day }}</td>
+                            {% elif day in unavailable_dates %}
+                                <td class="unavailable">{{ day.day }}</td>
                             {% else %}
-                            <td>{{ day }}</td>
-                        
+                                <td class="available">{{ day.day }}</td>
                             {% endif %}
                         
                         {% endfor %}
