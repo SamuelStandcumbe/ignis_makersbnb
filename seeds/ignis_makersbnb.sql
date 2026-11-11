@@ -29,6 +29,7 @@ CREATE TABLE requests (
     end_date DATE NOT NULL,
     CONSTRAINT fk_space FOREIGN KEY (space_id) REFERENCES spaces(id) ON DELETE CASCADE,
     CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_host FOREIGN key (host_id) REFERENCES users(id) ON DELETE CASCADE
     CONSTRAINT valid_range CHECK (end_date >= start_date)
     );
 
