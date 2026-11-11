@@ -19,12 +19,12 @@ class SpaceRepository:
         if rows:
             row = rows[0]
             return Space(
-                row["id"],
                 row["space_name"],
                 row["location"],
                 row["description"],
                 row["price"],
-                row["user_id"]
+                row["user_id"],
+                row["id"]
             )
         else:
             return None
