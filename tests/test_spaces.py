@@ -3,9 +3,6 @@ from database_connection import DatabaseConnection
 from lib.space import Space
 from lib.space_repository import SpaceRepository
 
-app.config["TESTING"] = True  # use the test database
-
-
 def reset_database():
     db = DatabaseConnection(test_mode=True)
     db.connect()
@@ -14,6 +11,7 @@ def reset_database():
 
 
 def logged_in_client():
+    app.config["TESTING"] = True
     client = app.test_client()
     with client.session_transaction() as session:
         session["user_id"] = 1  # Alice from the seed file
@@ -81,14 +79,15 @@ def test_posting_a_valid_space_saves_it_and_redirects():
 
 def test_posting_a_space_with_missing_fields_shows_errors():
     db = reset_database()
+    spaces_before = SpaceRepository(db).find_by_user(1)
     client = logged_in_client()
     response = client.post("/spaces", data={"space_name": "", "location": "Bristol", "description": "Up high", "price": ""})
     assert response.status_code == 400
     page = response.get_data(as_text=True)
     assert "Name is required" in page
     assert "Price is required" in page
-    assert len(SpaceRepository(db).find_by_user(1)) == 2  # still just Alice's 2 seeded spaces
-
+    spaces_after = SpaceRepository(db).find_by_user(1)
+    assert len(spaces_after) == len(spaces_before)
 
 def test_space_is_initialised():
     space = Space('Fishermans cottage by the harbour', 'Whitstable, Kent', 'Compact studio with a double bed, kitchenette and fast wifi. Five minutes from Shoreditch High Street station.' , 95, 1,1)
