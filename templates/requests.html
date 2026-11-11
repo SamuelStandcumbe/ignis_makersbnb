@@ -1,3 +1,5 @@
+
+<!-- UNDER CONSTRUCTION -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,15 +11,18 @@
         <h1>Booking requests</h1>
         <section class="received_requests">
             <h2>Requests I've received</h2>
-            <article>
-                <h3>Cosy Cottage in the Cotswolds</h3>
-                <p>
-                    Requested dates:
-                    <time datetime="2026-12-12">12 December 2026</time>
-                    to
-                    <time datetime="2026-12-15">15 December 2026</time>
-                </p>
-            </article>
+            {% for request in requests %}
+                <article>
+                    <h3>Cosy Cottage in the Cotswolds</h3>
+                    <p>
+                        Requested dates:
+                        {{request.requested_date}}
+                        <time datetime="2026-12-12">12 December 2026</time>
+                        to
+                        <time datetime="2026-12-15">15 December 2026</time>
+                    </p>
+                </article>
+            {% endfor %}
         </section>
     </main>
 </body>
