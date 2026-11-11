@@ -2,24 +2,25 @@
 <html lang="en-GB">
     <head>
         <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Makers BnB</title>
-        <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css">
-        <link rel="stylesheet" href="/static/styles.css">
+        <link rel="stylesheet" href="/static/css/styles.css">
     </head>
     <body>
         <header>
-            <h1>Makers BnB</h1>
+            <img id="logo" src="/static/images/makers-bnb-light-mode-logo.png">
             <nav>
-                <a>Spaces</a>
-                <a>Requests</a>
-                <a>Sign Out</a>
+                <a class="navigation" href="/spaces">Spaces</a>
+                <a class="navigation" href="/requests">Requests</a>
+                <a class="navigation" href="/login">Sign Out</a>
             </nav>
         </header>
-        <main>
-            <h2>Book {{ space_name }} today!</h2>
-            <h3>In {{ space_location }} for £{{ space_price }} per night</h3>
-            <p>{{ space_description }}</p>
-            
+        <main class="booking-page">
+            <section class="space-details">
+                <h2>Book {{ space_name }} today!</h2>
+                <h3>In {{ space_location }} for £{{ space_price }} per night</h3>
+                <p>{{ space_description }}</p>
+            </section>
             <div class="calendar-header">
                 <a href="{{ url_for('get_booking_page', id=request.view_args.id, year=previous_month.year, month=previous_month.month) }}">
                     &larr;
@@ -65,10 +66,11 @@
                     {% endfor %}
                 </tbody>
             </table>
-
-            <h3>Pick a night</h3>
-            <div><input type="date"></div>
-            <a>Request to Book!</a>
+            <section class="booking-form">
+                <h3>Pick a night</h3>
+                <input type="date" id="booking-date" name="booking_date">
+                <button type="button">Request to Book!</button>
+            </section>
         </main>
     </body>
 </html>
