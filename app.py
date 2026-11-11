@@ -154,7 +154,7 @@ def get_all_available_spaces():
 def post_users():
     repo = UserRepository(get_connection())
     user = User(
-        request.form["username"],
+        request.form["full_name"],
         request.form["email"],
         request.form["password"],
         "is_host" in request.form,

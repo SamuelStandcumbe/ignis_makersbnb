@@ -3,7 +3,7 @@ from lib.user import User
 #test that user instances with the correct variables
 def test_user_instancing():
     user = User("bob", "bob@gmail.com", "Password123", False)
-    assert user.username == "bob"
+    assert user.full_name == "bob"
     assert user.email == "bob@gmail.com"
     assert user.password == "Password123"
     assert user.host is False

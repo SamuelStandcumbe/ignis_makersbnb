@@ -136,6 +136,7 @@ header {
     padding: 0.8rem 1.5rem;
     cursor: pointer;
     transition: transform 0.2s ease;
+    margin-top: 10px;
 }
 
 .card input[type="submit"]:hover {

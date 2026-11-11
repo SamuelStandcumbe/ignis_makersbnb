@@ -40,7 +40,7 @@ def test_get_requests_made_returns_200(client):
 
 def test_post_user_creates_user(client, db_connection):
     response = client.post("/users", data={
-        "username": "carol",
+        "full_name": "carol",
         "email": "carol@gmail.com",
         "password": "Password234",
         "password_confirmation": "Password234",
@@ -50,5 +50,5 @@ def test_post_user_creates_user(client, db_connection):
     assert response.status_code == 302
 
     users = UserRepository(db_connection).all()
-    assert users[-1].username == "carol"
+    assert users[-1].full_name == "carol"
     assert users[-1].host == True
