@@ -39,7 +39,9 @@ INSERT INTO users (full_name, email, password, host) VALUES ('Bob Example', 'bob
 INSERT INTO spaces (space_name, location, description, price, user_id) VALUES ('Fisherman''s cottage by the harbour', 'Whitstable, Kent', 'Compact studio with a double bed, kitchenette and fast wifi. Five minutes from Shoreditch High Street station.' , 95, 1);
 INSERT INTO spaces (space_name, location, description, price, user_id) VALUES ('Stone barn in the Peak District', 'Edale, Derbyshire', 'Converted barn at the start of the Pennine Way. Boot room, drying rack and a big kitchen table.', 140, 1);
 INSERT INTO spaces (space_name, location, description, price, user_id) VALUES ('Bright studio near Brick Lane', 'Shoreditch, London', 'Compact studio with a double bed, kitchenette and fast wifi. Five minutes from Shoreditch High Street station.', 120, 1);
+INSERT INTO spaces (space_name, location, description, price, user_id) VALUES ('Coastal Retreat', 'Deal, Kent', 'A cosy seaside cottage with beautiful coastal views.', 110, 2);
 
 INSERT INTO requests (space_id, user_id, approved, start_date, end_date, host_id) VALUES (1, 2, FALSE, '2026-10-10', '2026-10-12', 1);
 INSERT INTO requests (space_id, user_id, approved, start_date, end_date, host_id) VALUES (2, 2, TRUE, '2026-11-28', '2026-11-30', 1);
 INSERT INTO requests (space_id, user_id, approved, start_date, end_date, host_id) VALUES (2, 2, TRUE, '2026-11-25', '2026-11-28', 1);
+INSERT INTO requests (space_id, user_id, approved, start_date, end_date, host_id) VALUES (4, 1, FALSE, '2026-12-10', '2026-12-12', 2);

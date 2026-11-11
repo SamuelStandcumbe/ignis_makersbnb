@@ -6,7 +6,10 @@ import datetime
 #test that all returns every request
 def test_all_returns_requests_for_host_no_requests(db_connection):
     db_connection.seed("seeds/ignis_makersbnb.sql")
+    db_connection.execute("DELETE FROM requests WHERE host_id = %s", [2])
+
     repo = RequestRepository(db_connection)
+
     assert repo.find_by_user(2) == []
 
 def test_all_returns_requests_for_host_with_requests(db_connection):
