@@ -8,6 +8,8 @@ from lib.space_repository import SpaceRepository
 #User imports
 from lib.user import User
 from lib.user_repository import UserRepository
+from lib.request import Request
+from lib.request_repository import RequestRepository
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "dev-secret-change-me")
@@ -89,9 +91,12 @@ def show_calendar():
 
 # To view requests recieved by a space owner
 # Scope to turn this into a .find with user ID when logged in.
-@app.route('/requests', methods=['GET'])
-def get_requests():
-    return render_template("requests.html")
+@app.route('/requests/<user_id>', methods=['GET'])
+def get_requests(user_id):
+    repo = RequestRepository(get_connection())
+    requests = repo.find_by_user(user_id)
+    return render_template("requests.html",
+                            requests= requests)
 
 # To view requests you as a user have made on spaces for a specific date
 # Scope to work specifically with log in.
@@ -111,6 +116,8 @@ def post_users():
     )
     repo.create(user)
     return redirect("/login")
+
+
 
 
 if __name__ == '__main__':

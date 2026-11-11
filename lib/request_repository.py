@@ -18,4 +18,4 @@ class RequestRepository:
         rows = self._connection.execute(
             "SELECT * FROM requests WHERE user_id = %s ORDER BY id", [user_id]
         )
-        return [Request(row["id"], row["space_id"], row["user_id"], row["approved"], row["requested_date"]) for row in rows]
+        return [Request(row["space_id"], row["user_id"], row["approved"], row["requested_date"], row["id"]) for row in rows]
