@@ -1,4 +1,3 @@
-
 import os
 import calendar
 import psycopg
@@ -10,9 +9,6 @@ from lib.space_repository import SpaceRepository
 from lib.request_repository import RequestRepository
 from lib.user import User
 from lib.user_repository import UserRepository
-from lib.request import Request
-from lib.request_repository import RequestRepository
-
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "dev-secret-change-me")
@@ -33,12 +29,6 @@ def get_sign_up():
 @app.route('/login', methods=['GET'])
 def get_log_in():
     return render_template("log_in_page.html")
-
-# To view a list of all available spaces
-@app.route('/spaces', methods=['GET'])
-def get_available_spaces():
-    return render_template("available_spaces.html")
-
 
 # View form to create a new space (logged-in users only)
 @app.route('/spaces/new', methods=['GET'])
@@ -120,34 +110,39 @@ def get_booking_page(id):
         space_description=space.description
     )
 
-# To view requests recieved by a space owner
-# Scope to turn this into a .find with user ID when logged in.
-@app.route('/requests/<user_id>', methods=['GET', 'POST'])
-def get_requests(user_id):
-    repo = RequestRepository(get_connection())
-    requests = repo.find_by_user(user_id)
-    space_repo = SpaceRepository(get_connection())
-    spaces = space_repo.find_by_user(user_id)
-    return render_template("requests.html",
-                            requests= requests,
-                            spaces = spaces)
+# View booking requests sent and received by user 1
+@app.route('/requests', methods=['GET'])
+def get_requests():
+    user_id = 1  # Temporary until login is implemented
+    connection = get_flask_database_connection(app)
+
+    request_repo = RequestRepository(connection)
+    space_repo = SpaceRepository(connection)
+
+    received_requests = request_repo.find_by_user(user_id)
+    sent_requests = request_repo.find_requests_made_by_user(user_id)
+    spaces = space_repo.all()
+    spaces_by_id = {space.id: space for space in spaces}
+
+    return render_template(
+        "requests.html",
+        received_requests=received_requests,
+        sent_requests=sent_requests,
+        spaces_by_id=spaces_by_id
+    )
 
 @app.route('/requests/<user_id>/<request_id>/reject', methods=['POST'])
 def post_request_declined(user_id, request_id):
     repo = RequestRepository(get_connection())
     repo.reject_request(request_id)
-    return redirect(f"/requests/{user_id}")
+    return redirect("/requests")
+
 
 @app.route('/requests/<user_id>/<request_id>/approve', methods=['POST'])
 def post_request_approved(user_id, request_id):
     repo = RequestRepository(get_connection())
     repo.approve_request(request_id)
-    return redirect(f"/requests/{user_id}")
-
-# View requests you have made on spaces
-@app.route('/view_requests', methods=['GET'])
-def get_requests_made():
-    return render_template("view_requests.html")
+    return redirect("/requests")
 
 # To view a list of all available spaces
 @app.route('/spaces', methods=['GET'])

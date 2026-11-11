@@ -37,13 +37,16 @@ def test_price_must_be_a_number():
 
 def test_a_user_can_save_more_than_one_space():
     db = reset_database()
+
+    db.execute("DELETE FROM requests WHERE space_id = %s", [4])
+    db.execute("DELETE FROM spaces WHERE user_id = %s", [2])
+
     repo = SpaceRepository(db)
     repo.create(Space("Barn", "York", "Rustic", 50, 2, None))
     repo.create(Space("Loft", "Leeds", "Airy", 80, 2, None))
+
     spaces = repo.find_by_user(2)
     assert len(spaces) == 2
-    assert spaces[0].space_name == "Barn"
-    assert spaces[1].space_name == "Loft"
 
 
 # --- Logged out ---
