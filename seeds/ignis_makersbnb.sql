@@ -40,4 +40,4 @@ INSERT INTO spaces (space_name, location, description, price, user_id) VALUES ('
 
 INSERT INTO requests (space_id, user_id, approved, start_date, end_date) VALUES (1, 2, FALSE, '2026-10-10', '2026-10-12');
 INSERT INTO requests (space_id, user_id, approved, start_date, end_date) VALUES (2, 2, TRUE, '2026-11-28', '2026-11-30');
-INSERT INTO requests (space_id, user_id, approved, start_date, end_date) VALUES (2, 2, TRUE, '2027-01-02', '2027-01-03');
+INSERT INTO requests (space_id, user_id, approved, start_date, end_date) VALUES (2, 2, TRUE, '2026-11-25', '2026-11-28');
