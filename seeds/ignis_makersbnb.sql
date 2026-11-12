@@ -27,6 +27,8 @@ CREATE TABLE requests (
     host_id INTEGER NOT NULL,
     start_date DATE NOT NULL,
     end_date DATE NOT NULL,
+    paid BOOLEAN NOT NULL DEFAULT FALSE,
+    stripe_session_id VARCHAR(255),
     CONSTRAINT fk_space FOREIGN KEY (space_id) REFERENCES spaces(id) ON DELETE CASCADE,
     CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     CONSTRAINT fk_host FOREIGN key (host_id) REFERENCES users(id) ON DELETE CASCADE,

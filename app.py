@@ -2,6 +2,7 @@ import os
 import calendar
 import psycopg
 from datetime import date, timedelta
+import stripe
 from flask import Flask, render_template, request, redirect, session, flash, abort
 from database_connection import DatabaseConnection, get_flask_database_connection
 from lib.space import Space
@@ -14,6 +15,8 @@ from lib.user_repository import UserRepository
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "dev-secret-change-me")
 
+#configuring stripe api keys
+stripe.api_key = os.getenv("STRIPE_SECRET_KEY", "sk_test_mocked_key")
 
 def get_connection():
     connection = DatabaseConnection(test_mode=app.config.get("TESTING", False))
@@ -240,6 +243,30 @@ def post_request_approved(user_id, request_id):
     repo = RequestRepository(get_connection())
     repo.approve_request(request_id)
     return redirect("/requests")
+
+# -- stripe payment routes -- #
+
+@app.route('/checkout/<request_id>', methods=['POST'])
+def create_checkout_session(request_id):
+    if "user_id" not in session:
+        return redirect("/login")
+
+    connection = get_flask_database_connection(app)
+    request_repo = RequestRepository(connection)
+    space_repo = SpaceRepository(connection)
+
+    booking_request = request_repo.find_request_by_id(request_id)
+    if not booking_request:
+        flash("Request not found.")
+        return redirect("/requests")
+
+    space = space_repo.find_by_space_id(booking_request.space_id)
+
+    #calculate total price
+    nights = (booking_request.end_date - booking_request.start_date).days
+    total_amount = int(float(space.price) * max(nights, 1) * 100)
+
+    #creating the checkout session
 
 # To view a list of all available spaces
 @app.route('/spaces', methods=['GET'])
