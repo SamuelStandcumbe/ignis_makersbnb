@@ -91,11 +91,11 @@
                     </p>
 
                     {% if not request.approved %}
-                    <form method="POST" action="/requests/{{ request.host_id }}/{{ request.id }}/approve">
+                    <form method="POST" action="/requests/{{ request.id }}/approve">
                         <button type="submit" aria-label="Accept request for {{ spaces_by_id[request.space_id].space_name }}">Accept Request</button>
                     </form>
 
-                    <form method="POST" action="/requests/{{ request.host_id }}/{{ request.id }}/reject">
+                    <form method="POST" action="/requests/{{ request.id }}/reject">
                         <button type="submit" class="decline-button" aria-label="Decline request for {{ spaces_by_id[request.space_id].space_name }}">Decline Request</button>
                     </form>
                     {% endif %}

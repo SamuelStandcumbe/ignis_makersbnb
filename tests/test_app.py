@@ -60,7 +60,6 @@ def test_search_results_by_location(client):
 
 
 def test_requests_dashboard_shows_sent_and_received_requests(client, page:Page):
-    
     page.goto("http://localhost:5001/login")
     page.get_by_placeholder("example@example.com").fill("alice@example.com")
     page.get_by_placeholder("password123").fill("password123")
