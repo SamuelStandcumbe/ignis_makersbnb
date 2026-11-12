@@ -26,10 +26,20 @@ class RequestRepository:
     #function to see if there is overlap in the requested dates - requested and booked/unavailable. 
     def has_overlap(self, space_id, start_date, end_date):
         rows = self._connection.execute(
-            'SELECT id FROM requests WHERE space_id = %s AND approved = True'
+            'SELECT id FROM requests WHERE space_id = %s AND approved = True '
             'AND start_date <= %s AND end_date >= %s',
             [space_id, end_date, start_date])
         return len(rows) > 0 #only returns true if there is overlap - otherwise False
+    # Save a new booking request for one or more nights
+    def create(self, booking_request):
+        rows = self._connection.execute(
+            'INSERT INTO requests (space_id, user_id, approved, start_date, end_date, host_id) '
+            'VALUES (%s, %s, %s, %s, %s, %s) RETURNING id',
+            [booking_request.space_id, booking_request.user_id, booking_request.approved,
+             booking_request.start_date, booking_request.end_date, booking_request.host_id])
+        booking_request.id = rows[0]["id"]
+        return booking_request
+
     def approve_request(self, request_id):
         self._connection.execute(
             "UPDATE requests SET approved = True WHERE id = %s;", [request_id]

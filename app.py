@@ -2,10 +2,11 @@ import os
 import calendar
 import psycopg
 from datetime import date, timedelta
-from flask import Flask, render_template, request, redirect, session, flash
+from flask import Flask, render_template, request, redirect, session, flash, abort
 from database_connection import DatabaseConnection, get_flask_database_connection
 from lib.space import Space
 from lib.space_repository import SpaceRepository
+from lib.request import Request
 from lib.request_repository import RequestRepository
 from lib.user import User
 from lib.user_repository import UserRepository
@@ -96,6 +97,78 @@ def create_space():
 # View available dates for a specific property
 @app.route('/make_request/<id>', methods=["GET"])
 def get_booking_page(id):
+    return render_booking_page(id)
+
+
+# How far ahead guests can book (the calendar's bookable range)
+MAX_DAYS_AHEAD = 365
+
+
+def parse_date(value):
+    try:
+        return date.fromisoformat(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def format_stay(start_date, end_date):
+    if start_date == end_date:
+        return start_date.strftime('%-d %B %Y')
+    return f"{start_date.strftime('%-d %B %Y')} to {end_date.strftime('%-d %B %Y')}"
+
+
+# Send a request to book a space for one or more nights (logged-in users only)
+@app.route('/make_request/<id>', methods=["POST"])
+def post_booking_request(id):
+    if "user_id" not in session:
+        return redirect("/login")
+
+    connection = get_flask_database_connection(app)
+    request_repository = RequestRepository(connection)
+
+    space = SpaceRepository(connection).find_by_space_id(id)
+    if space is None:
+        abort(404)
+
+    start_date = parse_date(request.form.get("start_date", ""))
+    if start_date is None:
+        return render_booking_page(id, errors=["Please pick a start date."]), 400
+
+    # Leaving the end date blank means a single night
+    end_date_text = request.form.get("end_date", "")
+    end_date = parse_date(end_date_text) if end_date_text else start_date
+    if end_date is None:
+        return render_booking_page(id, errors=["Please pick a valid end date."]), 400
+
+    booking_request = Request(
+        space_id=space.id,
+        user_id=session["user_id"],
+        approved=False,
+        start_date=start_date,
+        end_date=end_date,
+        host_id=space.user_id,  # always the space's owner, never taken from the form
+    )
+
+    if not booking_request.is_valid():
+        return render_booking_page(id, errors=booking_request.generate_errors()), 400
+
+    if start_date < date.today():
+        return render_booking_page(id, errors=["You can't book nights in the past."]), 400
+
+    if end_date > date.today() + timedelta(days=MAX_DAYS_AHEAD):
+        return render_booking_page(id, errors=["You can only book up to a year ahead."]), 400
+
+    if request_repository.has_overlap(space.id, start_date, end_date):
+        return render_booking_page(id, errors=["Sorry, some of those nights are already booked."]), 400
+
+    request_repository.create(booking_request)
+
+    flash(f"Request sent! Your request for {format_stay(start_date, end_date)} "
+          f"is pending until the host responds.")
+    return redirect(f"/make_request/{space.id}")
+
+
+def render_booking_page(id, errors=[]):
     connection = get_flask_database_connection(app)
 
     space_repository = SpaceRepository(connection)
@@ -128,7 +201,10 @@ def get_booking_page(id):
         space_name=space.space_name,
         space_location=space.location,
         space_price=space.price,
-        space_description=space.description
+        space_description=space.description,
+        space_id=space.id,
+        errors=errors,
+        last_bookable_day=today + timedelta(days=MAX_DAYS_AHEAD)
     )
 
 # View booking requests sent and received by user 1
