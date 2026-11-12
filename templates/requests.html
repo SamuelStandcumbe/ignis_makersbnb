@@ -28,7 +28,37 @@
                 </div>
             {% endfor %}
             <h1 class="intro">Booking requests</h1>
+            <section class="requests">
+                <h2>Requests I've made</h2>
 
+                {% for request in sent_requests %}
+                <article class="card">
+                    <h3>{{ spaces_by_id[request.space_id].space_name }}</h3>
+
+                    <p>
+                        Requested dates:
+                        <time datetime="{{ request.start_date }}">
+                            {{ request.start_date }}
+                        </time>
+                        to
+                        <time datetime="{{ request.end_date }}">
+                            {{ request.end_date }}
+                        </time>
+                    </p>
+
+                    <p>
+                        Status:
+                        {% if request.approved %}
+                            Approved
+                        {% else %}
+                            Pending
+                        {% endif %}
+                    </p>
+                </article>
+                {% else %}
+                <p>You haven't made any booking requests yet.</p>
+                {% endfor %}
+            </section>
             <section class="requests">
                 <h2>Requests I've received</h2>
 
@@ -68,38 +98,6 @@
                 </article>
                 {% else %}
                 <p>You haven't received any booking requests yet.</p>
-                {% endfor %}
-            </section>
-
-            <section class="requests">
-                <h2>Requests I've made</h2>
-
-                {% for request in sent_requests %}
-                <article class="card">
-                    <h3>{{ spaces_by_id[request.space_id].space_name }}</h3>
-
-                    <p>
-                        Requested dates:
-                        <time datetime="{{ request.start_date }}">
-                            {{ request.start_date }}
-                        </time>
-                        to
-                        <time datetime="{{ request.end_date }}">
-                            {{ request.end_date }}
-                        </time>
-                    </p>
-
-                    <p>
-                        Status:
-                        {% if request.approved %}
-                            Approved
-                        {% else %}
-                            Pending
-                        {% endif %}
-                    </p>
-                </article>
-                {% else %}
-                <p>You haven't made any booking requests yet.</p>
                 {% endfor %}
             </section>
         </main>
