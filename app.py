@@ -40,7 +40,6 @@ def get_search_results(search_term):
     connection = DatabaseConnection()
     connection.connect()
     repository = SpaceRepository(connection)
-    # change to new method
     related_spaces = repository.find_by_search(search_term)
     return render_template("search_results.html", related_spaces = related_spaces)
 

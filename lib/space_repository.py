@@ -55,7 +55,7 @@ class SpaceRepository:
 
     def find_by_search(self, search_term):
             rows = self._connection.execute(
-                "SELECT * FROM spaces WHERE space_name LIKE %s OR description LIKE %s OR location LIKE %s;",
+                "SELECT * FROM spaces WHERE space_name ILIKE %s OR description ILIKE %s OR location ILIKE %s;",
                 [
                     f'%{search_term}%',
                     f'%{search_term}%',
