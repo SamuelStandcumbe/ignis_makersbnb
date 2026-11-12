@@ -31,7 +31,8 @@ class SpaceRepository:
 
     def find_by_user(self, user_id):
         rows = self._connection.execute(
-            "SELECT * FROM spaces WHERE user_id = %s ORDER BY id", [user_id]
+            "SELECT * FROM spaces WHERE user_id = %s ORDER BY id",
+            [user_id]
         )
         return [Space(row["space_name"], row["location"], row["description"],
                     row["price"], row["user_id"], row["id"]) for row in rows]
@@ -51,3 +52,15 @@ class SpaceRepository:
 
         space.id = rows[0]["id"]
         return space
+
+    def find_by_search(self, search_term):
+            rows = self._connection.execute(
+                "SELECT * FROM spaces WHERE space_name LIKE %s OR description LIKE %s OR location LIKE %s;",
+                [
+                    f'%{search_term}%',
+                    f'%{search_term}%',
+                    f'%{search_term}%'
+                ]
+            )
+            return [Space(row["space_name"], row["location"], row["description"],
+                        row["price"], row["user_id"], row["id"]) for row in rows]
