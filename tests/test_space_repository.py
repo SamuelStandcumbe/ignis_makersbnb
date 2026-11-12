@@ -24,3 +24,14 @@ def test_find_by_space_id(db_connection):
         1,
         1
     )
+
+def test_find_by_search_term(db_connection):
+    db_connection.seed("seeds/ignis_makersbnb.sql")
+    repo = SpaceRepository(db_connection)
+    assert repo.find_by_search("London") == [Space('Bright studio near Brick Lane',
+        'Shoreditch, London',
+        'Compact studio with a double bed, kitchenette and fast wifi. Five minutes from Shoreditch High Street station.',
+        120.00,
+        1,
+        3
+    )]

@@ -8,8 +8,9 @@
     </head>
     <body>
         <header>
-            <img id="logo" src="/static/images/makers-bnb-light-mode-logo.png">
-            <nav>
+            <img id="logo" src="/static/images/makers-bnb-light-mode-logo.png" alt="MakersBnB Logo">
+            {% include '/partials/search_bar.html' %}
+            <nav aria-label="Main Navigation">
                 <a class="navigation" href="/login">Log In</a>
             </nav>
         </header>
@@ -21,14 +22,14 @@
             <div class="card">
                 <h2>Sign up to MakersBnB</h2>
                 {% for message in get_flashed_messages() %}
-                <p style="color: red;"> {{message}} </p>
+                <p role="alert" style="color: rgb(136, 9, 9);"> {{message}} </p>
                 {% endfor %}
         <form method="POST" action="/users">
                     <label for="full_name">Full Name</label>
-                    <input type="text" id="full_name" name="full_name" placeholder="Joe Bloggs" required><br>
+                    <input type="full_name" id="full_name" name="full_name" placeholder="Joe Bloggs" required><br>
 
                     <label for="email">Email Address</label>
-                    <input type="text" id="email" name="email" placeholder="joe@example.com" required><br>
+                    <input type="email" id="email" name="email" placeholder="joe@example.com" required><br>
 
                     <label for="password">Password</label>
                     <input type="password" id="password" name="password" placeholder="super-secret-password" required><br>
