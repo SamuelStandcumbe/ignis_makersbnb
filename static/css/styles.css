@@ -194,6 +194,9 @@ header {
     outline-offset: 2px;
 }
 
+.log-in-card-heading {
+    text-align: center;
+}
 
 /* ========================================
     5. AVAILABLE SPACES PAGE
@@ -222,7 +225,7 @@ header {
                 border-color 0.2s ease;
 }
 
-.space-card h3 {
+.space-card h2 {
     color: #6000BC;
     font-size: 1.2rem;
     margin-bottom: 0.5rem;
