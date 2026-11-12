@@ -9,9 +9,12 @@
     <body>
         <header>
             <img id="logo" src="/static/images/makers-bnb-light-mode-logo.png" alt="MakersBnB Logo">
-            <nav>
+            <nav aria-label="Main Navigation">
                 <a class="navigation" href="/spaces">Spaces</a>
-                <a class="navigation current-page" href="/requests">Requests</a>
+                <a class="navigation current-page" href="/requests" aria-current="page">Requests</a>
+                {% if is_host %}
+                <a class="navigation" href="/spaces/new">Create Space</a>
+                {% endif %}
                 <form action="/logout" method="POST" style="display: inline; margin:0; padding: 0;">
                     <button type="submit" class="navigation">Log Out</button>
                 </form>
@@ -50,11 +53,11 @@
 
                     {% if not request.approved %}
                     <form method="POST" action="/requests/{{ request.host_id }}/{{ request.id }}/approve">
-                        <button type="submit">Accept Request</button>
+                        <button type="submit" aria-label="Accept request for {{ spaces_by_id[request.space_id].space_name }}">Accept Request</button>
                     </form>
 
                     <form method="POST" action="/requests/{{ request.host_id }}/{{ request.id }}/reject">
-                        <button type="submit" class="decline-button">Decline Request</button>
+                        <button type="submit" class="decline-button" aria-label="Decline request for {{ spaces_by_id[request.space_id].space_name }}">Decline Request</button>
                     </form>
                     {% endif %}
                 </article>
