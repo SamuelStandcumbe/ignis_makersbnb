@@ -9,6 +9,7 @@
 <body>
         <header>
             <img id="logo" src="/static/images/makers-bnb-light-mode-logo.png" alt="Makers BnB logo">
+            {% include '/partials/search_bar.html' %}
             <nav>
                 <form action="/logout" method="POST" style="display: inline; margin:0; padding: 0;">
                     <button type="submit" class="navigation">Log Out</button>

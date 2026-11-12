@@ -25,6 +25,28 @@ def get_connection():
 def get_sign_up():
     return render_template("sign_up_page.html")
 
+# ------------------------------------------------
+# SEARCH ROUTES
+# ------------------------------------------------
+
+# To post the search terms
+@app.route('/', methods=['POST'])
+def create_search():
+    search_term = request.form["search"]
+    return redirect(f"/search/{search_term}")
+
+# collects search term, looks up in db, renders results here
+@app.route('/search/<search_term>', methods=['GET'])
+def get_search_results(search_term):
+    connection = DatabaseConnection()
+    connection.connect()
+    repository = SpaceRepository(connection)
+    related_spaces = repository.find_by_search(search_term)
+    return render_template("search_results.html", related_spaces = related_spaces)
+
+# -------------------------------------------------
+
+
 # View form for login
 @app.route('/login', methods=['GET'])
 def get_log_in():
