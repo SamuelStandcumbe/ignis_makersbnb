@@ -192,7 +192,7 @@ def post_users():
 def logging_out():
     session.clear()
     flash(" 🔒 You have been logged out. 👋")
-    return redirect('/')
+    return redirect('/login')
 
 
 if __name__ == '__main__':
