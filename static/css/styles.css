@@ -510,3 +510,19 @@ header {
         padding: 1.5rem;
     }
 }
+
+
+
+
+/* ========================================
+    10. ACCESSIBILITY & FOCUS STYLES
+======================================== */
+
+
+.navigation:focus-visible,
+.space-link:focus-visible,
+button:focus-visible,
+a:focus-visible {
+    outline: 3px solid #4400f1; /* High-contrast dark outline  */
+    outline-offset: 3px; /* Creates a white gap so it never blends into the purple */
+}

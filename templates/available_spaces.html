@@ -9,7 +9,7 @@
     <body>
         <header>
             <img id="logo" src="/static/images/makers-bnb-light-mode-logo.png" alt="MakersBnB Logo">
-            <nav>
+            <nav aria-label="Main Navigation">
                 <a class="navigation current-page" href="/spaces" aria-current="page">Spaces</a>
                 <a class="navigation" href="/requests">Requests</a>
                 <form action="/logout" method="POST" style="display: inline; margin:0; padding: 0;">
@@ -23,7 +23,7 @@
                 {% for space in available_spaces %}
                     <a class="space-link" href="/make_request/{{ space.id }}">
                         <article class="space-card">
-                            <h3>{{ space.space_name }}</h3>
+                            <h2>{{ space.space_name }}</h2>
                             <p class="space-price">£{{ space.price }} per night</p>
                             <p class="space-description">{{ space.description }}</p>
                         </article>
