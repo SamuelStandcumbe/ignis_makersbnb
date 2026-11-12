@@ -8,11 +8,14 @@
     </head>
     <body>
         <header>
-            <img id="logo" src="/static/images/makers-bnb-light-mode-logo.png" alt="Makers BnB logo">
+            <img id="logo" src="/static/images/makers-bnb-light-mode-logo.png" alt="MakersBnB Logo">
             {% include '/partials/search_bar.html' %}
-            <nav>
+            <nav aria-label="Main Navigation">
                 <a class="navigation" href="/spaces">Spaces</a>
-                <a class="navigation current-page" href="/requests">Requests</a>
+                <a class="navigation current-page" href="/requests" aria-current="page">Requests</a>
+                {% if is_host %}
+                <a class="navigation" href="/spaces/new">Create Space</a>
+                {% endif %}
                 <form action="/logout" method="POST" style="display: inline; margin:0; padding: 0;">
                     <button type="submit" class="navigation">Log Out</button>
                 </form>
@@ -20,54 +23,15 @@
         </header>
 
         <main>
-            <h1 class="intro">Booking requests</h1>
-
-            {% for message in get_flashed_messages() %}
-                <p class="notice">{{ message }}</p>
+            {% for category, message in get_flashed_messages(with_categories=True) %}
+                <div class="alert alert-{{ category }}" role="alert">
+                    {{ message }}
+                    <button type="button" class="alert-close" aria-label="Dismiss message" onclick="this.closest('.alert').remove()">
+                        &times;
+                    </button>
+                </div>
             {% endfor %}
-
-            <section class="requests">
-                <h2>Requests I've received</h2>
-
-                {% for request in received_requests %}
-                <article class="card">
-                    <h3>{{ spaces_by_id[request.space_id].space_name }}</h3>
-
-                    <p>
-                        Requested dates:
-                        <time datetime="{{ request.start_date }}">
-                            {{ request.start_date }}
-                        </time>
-                        to
-                        <time datetime="{{ request.end_date }}">
-                            {{ request.end_date }}
-                        </time>
-                    </p>
-
-                    <p>
-                        Status:
-                        {% if request.approved %}
-                            Approved
-                        {% else %}
-                            Pending
-                        {% endif %}
-                    </p>
-
-                    {% if not request.approved %}
-                    <form method="POST" action="/requests/{{ request.host_id }}/{{ request.id }}/approve">
-                        <button type="submit">Accept Request</button>
-                    </form>
-
-                    <form method="POST" action="/requests/{{ request.host_id }}/{{ request.id }}/reject">
-                        <button type="submit" class="decline-button">Decline Request</button>
-                    </form>
-                    {% endif %}
-                </article>
-                {% else %}
-                <p>You haven't received any booking requests yet.</p>
-                {% endfor %}
-            </section>
-
+            <h1 class="intro">Booking requests</h1>
             <section class="requests">
                 <h2>Requests I've made</h2>
 
@@ -97,6 +61,47 @@
                 </article>
                 {% else %}
                 <p>You haven't made any booking requests yet.</p>
+                {% endfor %}
+            </section>
+            <section class="requests">
+                <h2>Requests I've received</h2>
+
+                {% for request in received_requests %}
+                <article class="card">
+                    <h3>{{ spaces_by_id[request.space_id].space_name }}</h3>
+
+                    <p>
+                        Requested dates:
+                        <time datetime="{{ request.start_date }}">
+                            {{ request.start_date }}
+                        </time>
+                        to
+                        <time datetime="{{ request.end_date }}">
+                            {{ request.end_date }}
+                        </time>
+                    </p>
+
+                    <p>
+                        Status:
+                        {% if request.approved %}
+                            Approved
+                        {% else %}
+                            Pending
+                        {% endif %}
+                    </p>
+
+                    {% if not request.approved %}
+                    <form method="POST" action="/requests/{{ request.host_id }}/{{ request.id }}/approve">
+                        <button type="submit" aria-label="Accept request for {{ spaces_by_id[request.space_id].space_name }}">Accept Request</button>
+                    </form>
+
+                    <form method="POST" action="/requests/{{ request.host_id }}/{{ request.id }}/reject">
+                        <button type="submit" class="decline-button" aria-label="Decline request for {{ spaces_by_id[request.space_id].space_name }}">Decline Request</button>
+                    </form>
+                    {% endif %}
+                </article>
+                {% else %}
+                <p>You haven't received any booking requests yet.</p>
                 {% endfor %}
             </section>
         </main>
