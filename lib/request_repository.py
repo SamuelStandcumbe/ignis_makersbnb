@@ -39,7 +39,7 @@ class RequestRepository:
             'INSERT INTO requests (space_id, user_id, approved, start_date, end_date, host_id, paid, stripe_session_id) '
             'VALUES (%s, %s, %s, %s, %s, %s) RETURNING id',
             [booking_request.space_id, booking_request.user_id, booking_request.approved,
-             booking_request.start_date, booking_request.end_date, booking_request.host_id])
+            booking_request.start_date, booking_request.end_date, booking_request.host_id])
         booking_request.id = rows[0]["id"]
         return booking_request
 

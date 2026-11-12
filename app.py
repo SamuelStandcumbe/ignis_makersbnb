@@ -246,6 +246,7 @@ def post_request_approved(user_id, request_id):
 
 # -- stripe payment routes -- #
 
+#session for checkout
 @app.route('/checkout/<request_id>', methods=['POST'])
 def create_checkout_session(request_id):
     if "user_id" not in session:
@@ -267,6 +268,44 @@ def create_checkout_session(request_id):
     total_amount = int(float(space.price) * max(nights, 1) * 100)
 
     #creating the checkout session
+    try:
+        checkout_session = stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            line_items=[{
+                'price_data': {
+                    'currency': 'gbp',
+                    'product_data': {'name': space.space_name},
+                    'unit_amount': total_amount,
+                },
+                'quantity': 1,
+            }],
+            mode='payment',
+            success_url=request.host_url + f'payemnt/success?request_id={request_id}&session_id={{CHECKOUT_SESSION_ID}}',
+            cancel_url=request.host_url + f'payment/cancel?request_id={request_id}',
+        )
+    except Exception as e:
+        flash(f"Could not intiate payment: {str(e)}")
+        return redirect("/requests")
+
+    return redirect(checkout_session.url, code=303)
+
+#successful payment
+@app.route('/payment/success', methods=['GET'])
+def payment_success():
+    request_id = request.args.get('request_id')
+    session_id = request.args.get('session_id')
+
+    connection = get_flask_database_connection(app)
+    RequestRepository(connection).mark_as_paid(request_id, session_id)
+
+    flash("Payment successful! Your stay is secured.")
+    return redirect('/requests')
+
+#canceled payment
+@app.route('/payment/cancel', methods=['GET'])
+def payment_cancel():
+    flash("Payment was canceled or failed. Your booking remains unpaid")
+    return redirect('/requests')
 
 # To view a list of all available spaces
 @app.route('/spaces', methods=['GET'])
