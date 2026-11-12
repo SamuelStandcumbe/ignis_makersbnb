@@ -21,8 +21,8 @@
         <main>
             <h1 class="intro">Booking requests</h1>
 
-            <section>
-                <h2 class="requests">Requests I've received</h2>
+            <section class="requests">
+                <h2>Requests I've received</h2>
 
                 {% for request in received_requests %}
                 <article class="card">
@@ -54,7 +54,7 @@
                     </form>
 
                     <form method="POST" action="/requests/{{ request.host_id }}/{{ request.id }}/reject">
-                        <button type="submit">Decline Request</button>
+                        <button type="submit" class="decline-button">Decline Request</button>
                     </form>
                     {% endif %}
                 </article>
@@ -63,8 +63,8 @@
                 {% endfor %}
             </section>
 
-            <section>
-                <h2 class="requests">Requests I've made</h2>
+            <section class="requests">
+                <h2>Requests I've made</h2>
 
                 {% for request in sent_requests %}
                 <article class="card">
