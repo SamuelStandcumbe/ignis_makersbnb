@@ -32,10 +32,10 @@ def get_sign_up():
 @app.route('/', methods=['POST'])
 def create_search():
     search_term = request.form["search"]
-    return redirect(f"/{search_term}")
+    return redirect(f"/search/{search_term}")
 
 # collects search term, looks up in db, renders results here
-@app.route('/<search_term>', methods=['GET'])
+@app.route('/search/<search_term>', methods=['GET'])
 def get_search_results(search_term):
     connection = DatabaseConnection()
     connection.connect()

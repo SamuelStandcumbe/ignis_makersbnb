@@ -11,11 +11,13 @@ def test_get_make_request_shows_unavailable_dates(client):
     html = response.data.decode()
     assert '<td class="unavailable">28</td>' in html
 
-
 def test_get_sign_up_returns_200(client):
     response = client.get("/")
     assert response.status_code == 200
 
+def test_get_search_results_returns_200(client):
+    response = client.get("/search/cottage")
+    assert response.status_code == 200
 
 def test_get_log_in_returns_200(client):
     response = client.get("/login")
@@ -30,6 +32,30 @@ def test_get_available_spaces_returns_200(client):
 def test_get_requests_returns_200(client):
     response = client.get("/requests")
     assert response.status_code == 200
+
+def test_search_results_shows_relevant_listings(client):
+    response = client.get("/search/cottage")
+    html = unescape(response.data.decode("utf-8"))
+
+    # Properties of found space name, then description
+    assert "cottage" in html
+    assert "Compact studio with a double bed" in html
+
+def test_bad_search_results_shows_error(client):
+    response = client.get("/search/sss")
+    html = unescape(response.data.decode("utf-8"))
+
+    # Properties of found space
+    assert "No spaces match your search" in html
+
+def test_search_results_by_location(client):
+    response = client.get("/search/london")
+    html = unescape(response.data.decode("utf-8"))
+
+    # Properties of found space
+    assert 'Brick Lane' in html
+    assert "double bed" in html
+    
 
 def test_requests_dashboard_shows_sent_and_received_requests(client):
     response = client.get("/requests")
