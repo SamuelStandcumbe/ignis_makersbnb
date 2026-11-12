@@ -51,11 +51,6 @@ def create_sessions():
         flash("⚠️ Invalid Email Address or Password! ")
         return redirect("/login")
 
-# To view a list of all available spaces
-@app.route('/spaces', methods=['GET'])
-def get_available_spaces():
-    return render_template("available_spaces.html")
-
 # View form to create a new space (logged-in users only)
 @app.route('/spaces/new', methods=['GET'])
 def get_create_space_form():
