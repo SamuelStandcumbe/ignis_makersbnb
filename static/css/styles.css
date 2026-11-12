@@ -220,6 +220,66 @@ header {
     text-align: center;
 }
 
+/* Request cards */
+
+.requests .card {
+    max-width: 650px;
+    width: 100%;
+    padding: 1.5rem 2rem;
+    margin: 1.25rem auto;
+    border-radius: 15px;
+    background-color: #F7F4FF;
+}
+
+.requests .card h3 {
+    color: #6000BC;
+    font-size: 1.2rem;
+    margin-bottom: 0.75rem;
+}
+
+.requests .card p {
+    color: #6B6472;
+    line-height: 1.5;
+}
+
+/* Approval and decline buttons */
+
+.requests .card form {
+    display: inline-block;
+    margin-top: 1rem;
+    margin-right: 0.5rem;
+}
+
+.requests .card button {
+    padding: 0.65rem 1rem;
+    border: 1px solid #6000BC;
+    border-radius: 8px;
+    background-color: #6000BC;
+    color: #FFFFFF;
+    font: inherit;
+    cursor: pointer;
+    transition: background-color 0.2s ease,
+                transform 0.2s ease;
+}
+
+.requests .card button:hover {
+    background-color: #48008F;
+    transform: translateY(-2px);
+}
+
+.requests .card button:focus-visible {
+    outline: 2px solid #6000BC;
+    outline-offset: 3px;
+}
+
+.requests .card .decline-button {
+    background-color: transparent;
+    color: #6000BC;
+}
+
+.requests .card .decline-button:hover {
+    background-color: #E6D6FF;
+}
 
 /* ========================================
     7. BOOKING PAGE
