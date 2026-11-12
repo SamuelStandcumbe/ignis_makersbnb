@@ -1,3 +1,6 @@
+-- Needed for the no_double_booking rule on requests (lets space_id use = inside an EXCLUDE constraint)
+CREATE EXTENSION IF NOT EXISTS btree_gist;
+
 DROP TABLE IF EXISTS requests;
 DROP TABLE IF EXISTS spaces;
 DROP TABLE IF EXISTS users;
@@ -30,7 +33,12 @@ CREATE TABLE requests (
     CONSTRAINT fk_space FOREIGN KEY (space_id) REFERENCES spaces(id) ON DELETE CASCADE,
     CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     CONSTRAINT fk_host FOREIGN key (host_id) REFERENCES users(id) ON DELETE CASCADE,
-    CONSTRAINT valid_range CHECK (end_date >= start_date)
+    CONSTRAINT valid_range CHECK (end_date >= start_date),
+    -- Two APPROVED requests for the same space can never share a night (pending ones can)
+    CONSTRAINT no_double_booking EXCLUDE USING gist (
+        space_id WITH =,
+        daterange(start_date, end_date, '[]') WITH &&
+    ) WHERE (approved)
     );
 
 INSERT INTO users (full_name, email, password, host) VALUES (
@@ -77,5 +85,5 @@ INSERT INTO spaces (space_name, location, description, price, user_id) VALUES (
 
 INSERT INTO requests (space_id, user_id, approved, start_date, end_date, host_id) VALUES (1, 2, FALSE, '2026-10-10', '2026-10-12', 1);
 INSERT INTO requests (space_id, user_id, approved, start_date, end_date, host_id) VALUES (2, 2, TRUE, '2026-11-28', '2026-11-30', 1);
-INSERT INTO requests (space_id, user_id, approved, start_date, end_date, host_id) VALUES (2, 2, TRUE, '2026-11-25', '2026-11-28', 1);
+INSERT INTO requests (space_id, user_id, approved, start_date, end_date, host_id) VALUES (2, 2, TRUE, '2026-11-25', '2026-11-27', 1);
 INSERT INTO requests (space_id, user_id, approved, start_date, end_date, host_id) VALUES (4, 1, FALSE, '2026-12-10', '2026-12-12', 2);
