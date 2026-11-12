@@ -8,12 +8,14 @@
     </head>
     <body>
         <header>
-            <img id="logo" src="/static/images/makers-bnb-light-mode-logo.png">
+            <img id="logo" src="/static/images/makers-bnb-light-mode-logo.png" alt="MakersBnB Logo">
             {% include '/partials/search_bar.html' %}
-            <nav>
+            <nav aria-label="Main Navigation">
                 <a class="navigation" href="/spaces">Spaces</a>
                 <a class="navigation" href="/requests">Requests</a>
-
+                {% if is_host %}
+                <a class="navigation" href="/spaces/new">Create Space</a>
+                {% endif %}
                 <form action="/logout" method="POST" style="display: inline; margin:0; padding: 0;">
                     <button type="submit" class="navigation">Log Out</button>
                 </form>
@@ -21,32 +23,32 @@
         </header>
         <main class="booking-page">
             <section class="space-details">
-                <h2>Book {{ space_name }} today!</h2>
-                <h3>In {{ space_location }} for £{{ space_price }} per night</h3>
+                <h1>Book {{ space_name }} today!</h1>
+                <h2>In {{ space_location }} for £{{ space_price }} per night</h2>
                 <p>{{ space_description }}</p>
             </section>
             <div class="calendar-header">
-                <a href="{{ url_for('get_booking_page', id=request.view_args.id, year=previous_month.year, month=previous_month.month) }}">
+                <a href="{{ url_for('get_booking_page', id=request.view_args.id, year=previous_month.year, month=previous_month.month) }}" aria-label="Previous Month">
                     &larr;
                 </a>
 
                 <h2>{{ month_name }} {{ year }}</h2>
 
-                <a href="{{ url_for('get_booking_page', id=request.view_args.id, year=next_month.year, month=next_month.month) }}">
+                <a href="{{ url_for('get_booking_page', id=request.view_args.id, year=next_month.year, month=next_month.month) }}" aria-label="Next Month">
                     &rarr;
                 </a>
             </div>
 
-            <table>
+            <table aria-label="Availability calendar for {{month_name}} {{year}}">
                 <thead>
                     <tr>
-                        <th>Mon</th>
-                        <th>Tue</th>
-                        <th>Wed</th>
-                        <th>Thu</th>
-                        <th>Fri</th>
-                        <th>Sat</th>
-                        <th>Sun</th>
+                        <th scope="col">Mon</th>
+                        <th scope="col">Tue</th>
+                        <th scope="col">Wed</th>
+                        <th scope="col">Thu</th>
+                        <th scope="col">Fri</th>
+                        <th scope="col">Sat</th>
+                        <th scope="col">Sun</th>
                     </tr>
                 </thead>
                 
@@ -74,11 +76,11 @@
                 <h3>Pick your nights</h3>
 
                 {% for message in get_flashed_messages() %}
-                    <p class="notice">{{ message }}</p>
+                    <p class="notice" role="status">{{ message }}</p>
                 {% endfor %}
 
                 {% if errors %}
-                    <ul class="errors">
+                    <ul class="errors" role="alert">
                         {% for error in errors %}
                             <li>{{ error }}</li>
                         {% endfor %}

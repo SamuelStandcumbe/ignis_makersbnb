@@ -301,12 +301,12 @@ header {
     margin-bottom: 2.5rem;
 }
 
-.space-details h2 {
+.space-details h1 {
     font-size: 2rem;
     margin-bottom: 0.5rem;
 }
 
-.space-details h3 {
+.space-details h2 {
     color: #6000BC;
     font-size: 1.2rem;
     margin-bottom: 1rem;
@@ -539,4 +539,26 @@ header {
     .space-card {
         padding: 1.5rem;
     }
+}
+
+
+
+
+/* ========================================
+    10. ACCESSIBILITY & FOCUS STYLES
+======================================== */
+
+
+.navigation:focus-visible,
+.space-link:focus-visible,
+button:focus-visible,
+a:focus-visible {
+    outline: 3px solid #4400f1; /* High-contrast dark outline  */
+    outline-offset: 3px; /* Creates a white gap so it never blends into the purple */
+}
+
+
+p.intro{
+    font-size: 1.15rem;
+    font-weight: 505; 
 }
