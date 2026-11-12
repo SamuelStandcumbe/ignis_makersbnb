@@ -52,12 +52,20 @@
 
                     <p>
                         Status:
-                        {% if request.approved %}
-                            Approved
-                        {% else %}
+                        {% if not request.approved %}
                             Pending
+                        {% elif request.paid %}
+                            Paid
+                        {% else %}
+                            Approved, payment due
                         {% endif %}
                     </p>
+
+                    {% if request.approved and not request.paid %}
+                    <form method="POST" action="/checkout/{{ request.id }}">
+                        <button type="submit">Pay now</button>
+                    </form>
+                    {% endif %}
                 </article>
                 {% else %}
                 <p>You haven't made any booking requests yet.</p>

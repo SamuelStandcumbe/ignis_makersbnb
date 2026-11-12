@@ -36,7 +36,7 @@ class RequestRepository:
     # Save a new booking request for one or more nights
     def create(self, booking_request):
         rows = self._connection.execute(
-            'INSERT INTO requests (space_id, user_id, approved, start_date, end_date, host_id, paid, stripe_session_id) '
+            'INSERT INTO requests (space_id, user_id, approved, start_date, end_date, host_id) '
             'VALUES (%s, %s, %s, %s, %s, %s) RETURNING id',
             [booking_request.space_id, booking_request.user_id, booking_request.approved,
             booking_request.start_date, booking_request.end_date, booking_request.host_id])
@@ -57,20 +57,20 @@ class RequestRepository:
         rows = self._connection.execute(
             "SELECT * FROM requests WHERE id = %s;", [request_id]
         )
-        return [
-            Request(
-                row["space_id"],
-                row["user_id"],
-                row["approved"],
-                row["start_date"],
-                row["end_date"],
-                row["host_id"],
-                row["id"],
-                row["paid"],
-                row["stripe_session_id"]
-            )
-            for row in rows
-        ]
+        if not rows:
+            return None
+        row = rows[0]
+        return Request(
+            row["space_id"],
+            row["user_id"],
+            row["approved"],
+            row["start_date"],
+            row["end_date"],
+            row["host_id"],
+            row["id"],
+            row["paid"],
+            row["stripe_session_id"]
+        )
 
     def find_by_user(self, user_id):
         rows = self._connection.execute(

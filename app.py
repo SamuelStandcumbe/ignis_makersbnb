@@ -3,6 +3,7 @@ import calendar
 import psycopg
 from datetime import date, timedelta
 import stripe
+from decimal import Decimal, ROUND_HALF_UP
 from flask import Flask, render_template, request, redirect, session, flash, abort
 from database_connection import DatabaseConnection, get_flask_database_connection
 from lib.space import Space
@@ -16,12 +17,9 @@ from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "dev-secret-change-me")
 
-<<<<<<< HEAD
 #configuring stripe api keys
-stripe.api_key = os.getenv("STRIPE_SECRET_KEY", "sk_test_mocked_key")
+stripe.api_key = os.environ.get("STRIPE_SECRET_KEY")
 
-=======
->>>>>>> origin/main
 def get_connection():
     connection = DatabaseConnection(test_mode=app.config.get("TESTING", False))
     connection.connect()
@@ -265,7 +263,7 @@ def post_request_approved(user_id, request_id):
 # -- stripe payment routes -- #
 
 #session for checkout
-@app.route('/checkout/<request_id>', methods=['POST'])
+@app.route('/checkout/<int:request_id>', methods=['POST'])
 def create_checkout_session(request_id):
     if "user_id" not in session:
         return redirect("/login")
@@ -275,20 +273,27 @@ def create_checkout_session(request_id):
     space_repo = SpaceRepository(connection)
 
     booking_request = request_repo.find_request_by_id(request_id)
-    if not booking_request:
-        flash("Request not found.")
+    if not booking_request or booking_request.user_id != session['user_id']:
+        flash("Request not found.", "error")
+        return redirect("/requests")
+    if not booking_request.approved:
+        flash("This request hasn't been approved yet.", "error")
+        return redirect("/requests")
+    if booking_request.paid:
+        flash("This booking has already been paid for.", "error")
         return redirect("/requests")
 
     space = space_repo.find_by_space_id(booking_request.space_id)
 
     #calculate total price
-    nights = (booking_request.end_date - booking_request.start_date).days
-    total_amount = int(float(space.price) * max(nights, 1) * 100)
+    nights = max((booking_request.end_date - booking_request.start_date).days, 1)
+    total_amount = int(
+        (Decimal(str(space.price)) * nights * 100).quantize(Decimal("1"), rounding=ROUND_HALF_UP)
+    )
 
     #creating the checkout session
     try:
         checkout_session = stripe.checkout.Session.create(
-            payment_method_types=['card'],
             line_items=[{
                 'price_data': {
                     'currency': 'gbp',
@@ -298,31 +303,55 @@ def create_checkout_session(request_id):
                 'quantity': 1,
             }],
             mode='payment',
-            success_url=request.host_url + f'payemnt/success?request_id={request_id}&session_id={{CHECKOUT_SESSION_ID}}',
-            cancel_url=request.host_url + f'payment/cancel?request_id={request_id}',
+            client_reference_id=str(request_id),
+            success_url=request.host_url + 'payment/success?session_id={CHECKOUT_SESSION_ID}',
+            cancel_url=request.host_url + 'payment/cancel',
         )
     except Exception as e:
-        flash(f"Could not intiate payment: {str(e)}")
+        app.logger.exception("Stripe checkout session failed")
+        flash("Could not start the payment. Please try again.", "error")
         return redirect("/requests")
 
     return redirect(checkout_session.url, code=303)
 
-#successful payment
+#successful payment: ask Stripe whether the payment really happened before marking paid
 @app.route('/payment/success', methods=['GET'])
 def payment_success():
-    request_id = request.args.get('request_id')
+    if "user_id" not in session:
+        return redirect("/login")
+    
     session_id = request.args.get('session_id')
+    if not session_id:
+        flash("We couldn't confirm your payment.", "error")
+        return redirect("/requests")
 
-    connection = get_flask_database_connection(app)
-    RequestRepository(connection).mark_as_paid(request_id, session_id)
+    try:
+        checkout = stripe.checkout.Session.retrieve(session_id)
+    except Exception:
+        app.logger.exception("Stripe session lookup failed")
+        flash("We couldn't confirm your payment.", "error")
+        return redirect("/requests")
 
-    flash("Payment successful! Your stay is secured.")
-    return redirect('/requests')
+    if checkout.payment_status != "paid" or not checkout.client_reference_id:
+        flash("Payment was not completed. Your booking remains unpaid.", "error")
+        return redirect("/requests")
 
-#canceled payment
+    request_id = int(checkout.client_reference_id)
+    request_repo = RequestRepository(get_flask_database_connection(app))
+    booking_request = request_repo.find_request_by_id(request_id)
+    if not booking_request or booking_request.user_id != session["user_id"]:
+        flash("Request not found.", "error")
+        return redirect("/requests")
+
+    request_repo.mark_as_paid(request_id, session_id)
+    flash("Payment successful! Your stay is secured.", "success")
+    return redirect("/requests")
+
+
+#canceled payment: nothing changes in the db
 @app.route('/payment/cancel', methods=['GET'])
 def payment_cancel():
-    flash("Payment was canceled or failed. Your booking remains unpaid")
+    flash("Payment was canceled or failed. Your booking remains unpaid", "error")
     return redirect('/requests')
 
 # To view a list of all available spaces
