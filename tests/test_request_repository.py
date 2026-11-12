@@ -27,7 +27,7 @@ def test_find_unavailable_dates_by_space_id(db_connection):
     repo = RequestRepository(db_connection)
     assert repo.find_unavailable_dates_by_space_id(2) == [
         datetime.date(2026, 11, 25), datetime.date(2026, 11, 26),
-        datetime.date(2026, 11, 27), datetime.date(2026, 11, 28),
+        datetime.date(2026, 11, 27),
         datetime.date(2026, 11, 28), datetime.date(2026, 11, 29),
         datetime.date(2026, 11, 30),
     ]

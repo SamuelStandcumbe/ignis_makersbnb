@@ -50,7 +50,7 @@ class RequestRepository:
         found = self.find_request_by_id(request_id)
         if not found:
             return False
-        booking_request = found[0]
+        booking_request = found
 
         # 1. Recheck availability on the server, right before approving
         if self.has_overlap(booking_request.space_id, booking_request.start_date, booking_request.end_date):
