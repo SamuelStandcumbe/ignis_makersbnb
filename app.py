@@ -222,7 +222,7 @@ def render_booking_page(id, errors=[]):
 
 @app.route('/requests', methods=['GET'])
 def get_requests():
-    if session:
+    if "user_id" in session:
         user_id = session["user_id"] 
         connection = get_flask_database_connection(app)
 
