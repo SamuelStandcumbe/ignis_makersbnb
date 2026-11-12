@@ -77,7 +77,6 @@ def test_host_sees_message_when_approval_fails(client, db_connection):
     assert "already booked" in page
     assert is_approved(db_connection, clashing) == False
 
-
 # 5. Two competing approvals can't both succeed
 
 def test_database_refuses_a_second_overlapping_approval(db_connection):

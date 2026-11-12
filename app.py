@@ -222,12 +222,16 @@ def render_booking_page(id, errors=[]):
 
 @app.route('/requests', methods=['GET'])
 def get_requests():
-    if "user_id" in session:
-        user_id = session["user_id"] 
+    user_id = session.get("user_id")
+    if user_id:
         connection = get_flask_database_connection(app)
 
         request_repo = RequestRepository(connection)
         space_repo = SpaceRepository(connection)
+        user_repo = UserRepository(connection)
+
+        user = next((u for u in user_repo.all() if u.id == user_id), None)
+        is_host = user.host if user else False
 
         received_requests = request_repo.find_by_user(user_id)
         sent_requests = request_repo.find_requests_made_by_user(user_id)
@@ -238,7 +242,8 @@ def get_requests():
             "requests.html",
             received_requests=received_requests,
             sent_requests=sent_requests,
-            spaces_by_id=spaces_by_id
+            spaces_by_id=spaces_by_id,
+            is_host=is_host
         )
     else:
         return redirect("/login")
@@ -263,7 +268,15 @@ def get_all_available_spaces():
     connection.connect()
     available_spaces_repository = SpaceRepository(connection)
     available_spaces = available_spaces_repository.all()
-    return render_template("available_spaces.html", available_spaces = available_spaces)
+    user_id = session.get("user_id")
+    is_host = False
+    if user_id:
+        user_repo = UserRepository(connection)
+        user = next((u for u in user_repo.all() if u.id == user_id), None)
+        if user:
+            is_host = user.host
+
+    return render_template("available_spaces.html", available_spaces=available_spaces, is_host=is_host)
 
 # Receive signup form and save new user
 @app.route('/users', methods=['POST'])
@@ -284,6 +297,7 @@ def logging_out():
     session.clear()
     flash(" 🔒 You have been logged out. 👋")
     return redirect('/login')
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)
