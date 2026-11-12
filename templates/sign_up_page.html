@@ -20,11 +20,11 @@
                 <p>Discover your next home away from home with MakersBnB. Explore unique places to stay, find the perfect getaway, or share your own space with travellers. Wherever you're heading, feel at home with MakersBnB.</p>
             </div>
             <div class="card">
-                <h2>Sign up to MakersBnB</h2>
+                <h2 class="log-in-card-heading">Sign up to MakersBnB</h2>
                 {% for message in get_flashed_messages() %}
                 <p role="alert" style="color: rgb(136, 9, 9);"> {{message}} </p>
                 {% endfor %}
-        <form method="POST" action="/users">
+                <form method="POST" action="/users">
                     <label for="full_name">Full Name</label>
                     <input type="full_name" id="full_name" name="full_name" placeholder="Joe Bloggs" required><br>
 

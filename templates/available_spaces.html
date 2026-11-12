@@ -27,7 +27,7 @@
                 {% for space in available_spaces %}
                     <a class="space-link" href="/make_request/{{ space.id }}">
                         <article class="space-card">
-                            <h2>{{ space.space_name }}</h2>
+                            <h2 class="space-details">{{ space.space_name }}</h2>
                             <p class="space-price">£{{ space.price }} per night</p>
                             <p class="space-description">{{ space.description }}</p>
                         </article>
