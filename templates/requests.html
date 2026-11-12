@@ -19,6 +19,14 @@
         </header>
 
         <main>
+            {% for category, message in get_flashed_messages(with_categories=True) %}
+                <div class="alert alert-{{ category }}" role="alert">
+                    {{ message }}
+                    <button type="button" class="alert-close" aria-label="Dismiss message" onclick="this.closest('.alert').remove()">
+                        &times;
+                    </button>
+                </div>
+            {% endfor %}
             <h1 class="intro">Booking requests</h1>
 
             <section class="requests">

@@ -155,9 +155,8 @@ def post_booking_request(id):
 
     request_repository.create(booking_request)
 
-    flash(f"Request sent! Your request for {format_stay(start_date, end_date)} "
-          f"is pending until the host responds.")
-    return redirect(f"/make_request/{space.id}")
+    flash(f"Request sent! Your request for {format_stay(start_date, end_date)} is pending until the host responds.", "success")
+    return redirect("/requests")
 
 def render_booking_page(id, errors=[]):
     connection = get_flask_database_connection(app)

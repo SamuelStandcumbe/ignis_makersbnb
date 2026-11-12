@@ -53,9 +53,9 @@ def test_guest_can_request_a_range_and_sees_confirmation(client, db_connection):
     log_in_as(client, 2)
     response = book(client, 1, NEXT_WEEK, NEXT_WEEK_PLUS_2)
     assert response.status_code == 302
-    assert response.headers["Location"] == "/make_request/1"
+    assert response.headers["Location"] == "/requests"
 
-    page = client.get("/make_request/1").get_data(as_text=True)
+    page = client.get("/requests").get_data(as_text=True)
     assert "Request sent!" in page
     assert "pending" in page
 
