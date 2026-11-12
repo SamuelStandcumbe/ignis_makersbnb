@@ -63,6 +63,8 @@ def test_failed_approval_leaves_request_pending(db_connection):
 # 4. The host is told why approval failed
 
 def test_host_sees_message_when_approval_fails(client, db_connection):
+    with client.session_transaction() as session:
+        session["user_id"] = 1   # Alice owns space 1
     carol = add_guest(db_connection, "carol")
     add_request(db_connection, 1, 2, NEXT_MONTH, NEXT_MONTH + timedelta(days=2), approved=True)
     clashing = add_request(db_connection, 1, carol, NEXT_MONTH, NEXT_MONTH)
@@ -74,7 +76,6 @@ def test_host_sees_message_when_approval_fails(client, db_connection):
     page = client.get("/requests").get_data(as_text=True)
     assert "already booked" in page
     assert is_approved(db_connection, clashing) == False
-
 
 # 5. Two competing approvals can't both succeed
 

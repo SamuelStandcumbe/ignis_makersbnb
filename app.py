@@ -285,5 +285,6 @@ def logging_out():
     flash(" 🔒 You have been logged out. 👋")
     return redirect('/login')
 
+
 if __name__ == '__main__':
     app.run(debug=True, port=5001)
