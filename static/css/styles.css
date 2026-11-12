@@ -459,7 +459,37 @@ header {
 
 
 /* ========================================
-    9. RESPONSIVE STYLES
+    9. SEARCH BAR/ RESULTS PAGE
+======================================== */
+
+.search input{
+    display: inline-block;
+    padding: 0.5rem 0.8rem;
+    border-radius: 10px;
+    background-color: #FFFFFF;
+}
+
+#search_button {
+    border-radius: 10px;
+    font-size: large;
+    background-color: #6000BC;
+    color: #FFFFFF;
+    border: 1px solid #6000BC;
+    border-radius: 10px;
+}
+
+.error_card {
+    background-color: #F7F4FF;
+    padding: 1.5rem 2rem;
+    border: 1px solid transparent;
+    border-radius: 15px;
+    transition: transform 0.2s ease,
+                box-shadow 0.2s ease,
+                border-color 0.2s ease;
+}
+
+/* ========================================
+    10. RESPONSIVE STYLES
 ======================================== */
 
 @media (max-width: 600px) {
