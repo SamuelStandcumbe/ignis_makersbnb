@@ -163,3 +163,61 @@ def test_login_rejects_incorrect_password(client):
     assert response.headers["Location"] == "/login"
     with client.session_transaction() as session:
         assert "user_id" not in session
+
+
+def test_unauthenticated_user_redirected_from_requests(client, db_connection):
+    db_connection.seed("seeds/ignis_makersbnb.sql")
+
+    response = client.get("/requests")
+
+    assert response.status_code == 302
+    assert response.headers["Location"] == "/login"
+
+
+def test_authenticated_user_can_access_requests(client, db_connection):
+    db_connection.seed("seeds/ignis_makersbnb.sql")
+
+    with client.session_transaction() as sess:
+        sess["user_id"] = 1  # Log in as Alice
+
+    response = client.get("/requests")
+
+    assert response.status_code == 200
+    html = response.data.decode("utf-8")
+    assert "Requests" in html
+
+def test_unauthenticated_user_redirected_from_creating_new_spaces_page(client, db_connection):
+    db_connection.seed("seeds/ignis_makersbnb.sql")
+
+    response = client.get("/spaces/new")
+
+    assert response.status_code == 302
+    assert response.headers["Location"] == "/login"
+
+
+def test_authenticated_user_can_access_creating_new_spaces_page(client, db_connection):
+    db_connection.seed("seeds/ignis_makersbnb.sql")
+
+    with client.session_transaction() as sess:
+        sess["user_id"] = 1  # Log in as Alice
+
+    response = client.get("/spaces/new")
+
+    assert response.status_code == 200
+    html = response.data.decode("utf-8")
+    assert "List a Space" in html
+
+def test_create_space_link_only_visible_to_hosts(client, db_connection):
+    db_connection.seed("seeds/ignis_makersbnb.sql")
+
+    # Logged in as host (Alice, user_id=1)
+    with client.session_transaction() as sess:
+        sess["user_id"] = 1
+    host_html = client.get("/spaces").data.decode("utf-8")
+    assert "Create Space" in host_html
+
+    # Logged in as non-host guest (e.g. user_id=2)
+    with client.session_transaction() as sess:
+        sess["user_id"] = 2
+    guest_html = client.get("/spaces").data.decode("utf-8")
+    assert "Create Space" not in guest_html
