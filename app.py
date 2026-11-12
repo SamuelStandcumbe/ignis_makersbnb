@@ -10,10 +10,10 @@ from lib.request import Request
 from lib.request_repository import RequestRepository
 from lib.user import User
 from lib.user_repository import UserRepository
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "dev-secret-change-me")
-
 
 def get_connection():
     connection = DatabaseConnection(test_mode=app.config.get("TESTING", False))
@@ -25,7 +25,6 @@ def get_connection():
 def get_sign_up():
     return render_template("sign_up_page.html")
 
-
 # View form for login
 @app.route('/login', methods=['GET'])
 def get_log_in():
@@ -36,15 +35,14 @@ def get_log_in():
 
 @app.route('/sessions', methods=['POST'])
 def create_sessions():
-    connection = DatabaseConnection()
-    connection.connect()
+    connection = get_connection()
     user_repository = UserRepository(connection)
 
     email_address = request.form["email"]
     password = request.form["password"]
 
     user = user_repository.find_by_email_address(email_address)
-    if user is not None  and user.password == password:
+    if user is not None and check_password_hash(user.password, password):
         session["user_id"] = user.id
         session["email"] = user.email
         return redirect("/spaces")
@@ -58,7 +56,6 @@ def get_create_space_form():
     if "user_id" not in session:
         return redirect("/login")
     return render_template("create_new_space.html", errors=[], form={})
-
 
 # Save a new space for the logged-in user
 @app.route('/spaces', methods=['POST'])
@@ -93,16 +90,13 @@ def create_space():
 
     return redirect("/spaces")
 
-
 # View available dates for a specific property
 @app.route('/make_request/<id>', methods=["GET"])
 def get_booking_page(id):
     return render_booking_page(id)
 
-
 # How far ahead guests can book (the calendar's bookable range)
 MAX_DAYS_AHEAD = 365
-
 
 def parse_date(value):
     try:
@@ -110,12 +104,10 @@ def parse_date(value):
     except (TypeError, ValueError):
         return None
 
-
 def format_stay(start_date, end_date):
     if start_date == end_date:
         return start_date.strftime('%-d %B %Y')
     return f"{start_date.strftime('%-d %B %Y')} to {end_date.strftime('%-d %B %Y')}"
-
 
 # Send a request to book a space for one or more nights (logged-in users only)
 @app.route('/make_request/<id>', methods=["POST"])
@@ -166,7 +158,6 @@ def post_booking_request(id):
     flash(f"Request sent! Your request for {format_stay(start_date, end_date)} "
           f"is pending until the host responds.")
     return redirect(f"/make_request/{space.id}")
-
 
 def render_booking_page(id, errors=[]):
     connection = get_flask_database_connection(app)
@@ -234,7 +225,6 @@ def post_request_declined(user_id, request_id):
     repo.reject_request(request_id)
     return redirect("/requests")
 
-
 @app.route('/requests/<user_id>/<request_id>/approve', methods=['POST'])
 def post_request_approved(user_id, request_id):
     repo = RequestRepository(get_connection())
@@ -250,15 +240,15 @@ def get_all_available_spaces():
     available_spaces = available_spaces_repository.all()
     return render_template("available_spaces.html", available_spaces = available_spaces)
 
-
 # Receive signup form and save new user
 @app.route('/users', methods=['POST'])
 def post_users():
     repo = UserRepository(get_connection())
+    hashed_password = generate_password_hash(request.form["password"])
     user = User(
         request.form["full_name"],
         request.form["email"],
-        request.form["password"],
+        hashed_password,
         "is_host" in request.form,
     )
     repo.create(user)
@@ -269,7 +259,6 @@ def logging_out():
     session.clear()
     flash(" 🔒 You have been logged out. 👋")
     return redirect('/login')
-
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)
