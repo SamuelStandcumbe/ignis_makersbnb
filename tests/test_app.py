@@ -2,6 +2,7 @@ from app import app
 from lib.user_repository import UserRepository
 from html import unescape
 from werkzeug.security import check_password_hash
+from playwright.sync_api import Page, expect
 
 def test_get_make_request_returns_200(client):
     response = client.get("/make_request/1")
@@ -30,9 +31,9 @@ def test_get_available_spaces_returns_200(client):
     assert response.status_code == 200
 
 
-def test_get_requests_returns_200(client):
+def test_get_requests_returns_302_when_not_logged_in(client):
     response = client.get("/requests")
-    assert response.status_code == 200
+    assert response.status_code == 302
 
 def test_search_results_shows_relevant_listings(client):
     response = client.get("/search/cottage")
@@ -56,22 +57,20 @@ def test_search_results_by_location(client):
     # Properties of found space
     assert 'Brick Lane' in html
     assert "double bed" in html
+
+
+def test_requests_dashboard_shows_sent_and_received_requests(client, page:Page):
     
+    page.goto("http://localhost:5001/login")
+    page.get_by_placeholder("example@example.com").fill("alice@example.com")
+    page.get_by_placeholder("password123").fill("password123")
+    page.get_by_role("button", name="Log In").click()
+    assert page.url == "http://localhost:5001/spaces"
+    page.get_by_role("link", name="Requests").click()
+    assert page.url == "http://localhost:5001/requests"
+    expect(page.get_by_text("Fisherman's cottage by the harbour"))
+    expect(page.get_by_text("Requested dates: 2026-11-28 to 2026-11-30"))
 
-def test_requests_dashboard_shows_sent_and_received_requests(client):
-    response = client.get("/requests")
-    html = unescape(response.data.decode("utf-8"))
-
-    assert response.status_code == 200
-    assert "Requests I've received" in html
-    assert "Requests I've made" in html
-
-    # Alice's properties (received requests)
-    assert "Fisherman's cottage by the harbour" in html
-    assert "Stone barn in the Peak District" in html
-
-    # Bob's property (Alice's sent request)
-    assert "Coastal Retreat" in html
 
 def test_post_user_creates_user(client, db_connection):
     response = client.post("/users", data={

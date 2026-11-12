@@ -220,26 +220,29 @@ def render_booking_page(id, errors=[]):
         last_bookable_day=today + timedelta(days=MAX_DAYS_AHEAD)
     )
 
-# View booking requests sent and received by user 1
+
 @app.route('/requests', methods=['GET'])
 def get_requests():
-    user_id = 1  # Temporary until login is implemented
-    connection = get_flask_database_connection(app)
+    if session:
+        user_id = session["user_id"] 
+        connection = get_flask_database_connection(app)
 
-    request_repo = RequestRepository(connection)
-    space_repo = SpaceRepository(connection)
+        request_repo = RequestRepository(connection)
+        space_repo = SpaceRepository(connection)
 
-    received_requests = request_repo.find_by_user(user_id)
-    sent_requests = request_repo.find_requests_made_by_user(user_id)
-    spaces = space_repo.all()
-    spaces_by_id = {space.id: space for space in spaces}
+        received_requests = request_repo.find_by_user(user_id)
+        sent_requests = request_repo.find_requests_made_by_user(user_id)
+        spaces = space_repo.all()
+        spaces_by_id = {space.id: space for space in spaces}
 
-    return render_template(
-        "requests.html",
-        received_requests=received_requests,
-        sent_requests=sent_requests,
-        spaces_by_id=spaces_by_id
-    )
+        return render_template(
+            "requests.html",
+            received_requests=received_requests,
+            sent_requests=sent_requests,
+            spaces_by_id=spaces_by_id
+        )
+    else:
+        return redirect("/login")
 
 @app.route('/requests/<user_id>/<request_id>/reject', methods=['POST'])
 def post_request_declined(user_id, request_id):
