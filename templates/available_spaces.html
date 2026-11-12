@@ -8,11 +8,14 @@
     </head>
     <body>
         <header>
-            <img id="logo" src="/static/images/makers-bnb-light-mode-logo.png">
+            <img id="logo" src="/static/images/makers-bnb-light-mode-logo.png" alt="MakersBnB Logo">
             {% include '/partials/search_bar.html' %}
-            <nav>
-                <a class="navigation current-page">Spaces</a>
+            <nav aria-label="Main Navigation">
+                <a class="navigation current-page" href="/spaces" aria-current="page">Spaces</a>
                 <a class="navigation" href="/requests">Requests</a>
+                {% if is_host %}
+                <a class="navigation" href="/spaces/new">Create Space</a>
+                {% endif %}
                 <form action="/logout" method="POST" style="display: inline; margin:0; padding: 0;">
                     <button type="submit" class="navigation">Log Out</button>
                 </form>
@@ -24,7 +27,7 @@
                 {% for space in available_spaces %}
                     <a class="space-link" href="/make_request/{{ space.id }}">
                         <article class="space-card">
-                            <h3>{{ space.space_name }}</h3>
+                            <h2>{{ space.space_name }}</h2>
                             <p class="space-price">£{{ space.price }} per night</p>
                             <p class="space-description">{{ space.description }}</p>
                         </article>
