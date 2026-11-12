@@ -257,7 +257,8 @@ def post_request_declined(user_id, request_id):
 @app.route('/requests/<user_id>/<request_id>/approve', methods=['POST'])
 def post_request_approved(user_id, request_id):
     repo = RequestRepository(get_connection())
-    repo.approve_request(request_id)
+    if not repo.approve_request(request_id):
+        flash("Sorry, some of those dates are already booked for this space, so the request is still pending.")
     return redirect("/requests")
 
 # -- stripe payment routes -- #

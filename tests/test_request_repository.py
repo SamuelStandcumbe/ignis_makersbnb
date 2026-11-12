@@ -18,7 +18,7 @@ def test_all_returns_requests_for_host_with_requests(db_connection):
     assert repo.find_by_user(1) == [
         Request(1, 2, False, datetime.date(2026, 10, 10), datetime.date(2026, 10, 12), 1, 1),
         Request(2, 2, True, datetime.date(2026, 11, 28), datetime.date(2026, 11, 30), 1, 2),
-        Request(2, 2, True, datetime.date(2026, 11, 25), datetime.date(2026, 11, 28), 1, 3),
+        Request(2, 2, True, datetime.date(2026, 11, 25), datetime.date(2026, 11, 27), 1, 3),
     ]
 
 # test that approved ranges are expanded into every unavailable date

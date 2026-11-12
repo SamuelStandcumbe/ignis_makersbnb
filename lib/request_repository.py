@@ -1,3 +1,4 @@
+import psycopg
 from lib.request import Request
 
 class RequestRepository:
@@ -44,9 +45,27 @@ class RequestRepository:
         return booking_request
 
     def approve_request(self, request_id):
-        self._connection.execute(
-            "UPDATE requests SET approved = True WHERE id = %s;", [request_id]
-        )
+        # Approves a request only if none of its nights are already booked.
+        # Returns True if it was approved, False if it clashes with an approved booking.
+        found = self.find_request_by_id(request_id)
+        if not found:
+            return False
+        booking_request = found[0]
+
+        # 1. Recheck availability on the server, right before approving
+        if self.has_overlap(booking_request.space_id, booking_request.start_date, booking_request.end_date):
+            return False
+
+        # 2. The no_double_booking rule in the database is the final safety net:
+        #    if two approvals happen at the same moment, only one can succeed.
+        try:
+            self._connection.execute(
+                "UPDATE requests SET approved = True WHERE id = %s;", [request_id]
+            )
+        except psycopg.errors.ExclusionViolation:
+            self._connection.connection.rollback()
+            return False
+        return True
 
     def reject_request(self, request_id):
         self._connection.execute(
