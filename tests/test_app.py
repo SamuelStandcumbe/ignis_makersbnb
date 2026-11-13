@@ -64,9 +64,9 @@ def test_requests_dashboard_shows_sent_and_received_requests(client, page: Page,
     page.get_by_placeholder("example@example.com").fill("alice@example.com")
     page.get_by_placeholder("password123").fill("password123")
     page.get_by_role("button", name="Log In").click()
-    assert page.url == "http://localhost:5001/spaces"
+    assert page.url == f"{test_web_address}/spaces"
     page.get_by_role("link", name="Requests").click()
-    assert page.url == "http://localhost:5001/requests"
+    assert page.url == f"{test_web_address}/requests"
     expect(page.get_by_text("Fisherman's cottage by the harbour"))
     expect(page.get_by_text("Requested dates: 2026-11-28 to 2026-11-30"))
 

@@ -28,7 +28,7 @@ def client(db_connection):
 def test_web_address(xprocess):
     python_executable = sys.executable
     app_file = os.path.abspath(os.path.join(os.path.dirname(__file__), "../app.py"))
-    port = 5001
+    port = 5002
 
     class Starter(ProcessStarter):
         env = {**os.environ, "APP_ENV": "test", "PORT": str(port)}
