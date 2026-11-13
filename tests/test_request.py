@@ -3,10 +3,10 @@ from lib.request import Request
 
 #test that request instances with the correct variables
 def test_request_instancing():
-    request = Request(1, 2, False, date(2026, 10, 10), date(2026, 10, 10), 1)
+    request = Request(1, 2, 'pending', date(2026, 10, 10), date(2026, 10, 10), 1)
     assert request.space_id == 1
     assert request.user_id == 2
-    assert request.approved is False
+    assert request.approved_status == 'pending'
     assert request.start_date == date(2026, 10, 10)
     assert request.end_date == date(2026, 10, 10)
     assert request.host_id == 1

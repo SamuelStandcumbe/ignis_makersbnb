@@ -13,6 +13,7 @@
             <nav aria-label="Main Navigation">
                 <a class="navigation" href="/spaces">Spaces</a>
                 <a class="navigation current-page" href="/requests" aria-current="page">Requests</a>
+                <a class="navigation" href="/favourites">❤️</a>
                 {% if is_host %}
                 <a class="navigation" href="/spaces/new">Create Space</a>
                 {% endif %}
@@ -50,18 +51,20 @@
                         </time>
                     </p>
 
-                    <p>
+                    <p class="request-status">
                         Status:
-                        {% if not request.approved %}
-                            Pending
+                        {% if request.approved_status == 'pending' %}
+                            <span class="status-lozenge status-pending">Pending</span>
+                        {% elif request.approved_status == 'declined' %}
+                            <span class="status-lozenge status-declined">Declined</span>
                         {% elif request.paid %}
-                            Paid
+                            <span class="status-lozenge status-paid">Paid</span>
                         {% else %}
-                            Approved, payment due
+                            <span class="status-lozenge status-approved">Approved, payment due</span>
                         {% endif %}
                     </p>
 
-                    {% if request.approved and not request.paid %}
+                    {% if request.approved_status == 'approved' and not request.paid %}
                     <form method="POST" action="/checkout/{{ request.id }}">
                         <button type="submit">Pay now</button>
                     </form>
@@ -89,16 +92,18 @@
                         </time>
                     </p>
 
-                    <p>
+                    <p class="request-status">
                         Status:
-                        {% if request.approved %}
-                            Approved
-                        {% else %}
-                            Pending
+                        {% if request.approved_status == 'pending' %}
+                            <span class="status-lozenge status-pending">Pending</span>
+                        {% elif request.approved_status == 'approved' %}
+                            <span class="status-lozenge status-approved">Approved</span>
+                        {% elif request.approved_status == 'declined' %}
+                            <span class="status-lozenge status-declined">Declined</span>
                         {% endif %}
                     </p>
 
-                    {% if not request.approved %}
+                    {% if request.approved_status == 'pending' %}
                     <form method="POST" action="/requests/{{ request.id }}/approve">
                         <button type="submit" aria-label="Accept request for {{ spaces_by_id[request.space_id].space_name }}">Accept Request</button>
                     </form>

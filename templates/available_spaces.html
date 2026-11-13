@@ -1,39 +1,53 @@
 <!DOCTYPE html>
 <html lang="en-GB">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Makers BnB</title>
-        <link rel="stylesheet" href="/static/css/styles.css">
-    </head>
-    <body>
-        <header>
-            <img id="logo" src="/static/images/makers-bnb-light-mode-logo.png" alt="MakersBnB Logo">
-            {% include '/partials/search_bar.html' %}
-            <nav aria-label="Main Navigation">
-                <a class="navigation current-page" href="/spaces" aria-current="page">Spaces</a>
-                <a class="navigation" href="/requests">Requests</a>
-                {% if is_host %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MakersBnB</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <header>
+        <img id="logo" src="/static/images/makers-bnb-light-mode-logo.png" alt="MakersBnB Logo">
+        {% include '/partials/search_bar.html' %}
+        <nav aria-label="Main Navigation">
+            <a class="navigation current-page" href="/spaces" aria-current="page">Spaces</a>
+            <a class="navigation" href="/requests">Requests</a>
+            {% if is_logged_in %}
+                <a class="navigation" href="/favourites">❤️</a>
+            {% endif %}
+            {% if is_host %}
                 <a class="navigation" href="/spaces/new">Create Space</a>
-                {% endif %}
-                <form action="/logout" method="POST" style="display: inline; margin:0; padding: 0;">
-                    <button type="submit" class="navigation">Log Out</button>
-                </form>
-            </nav>
-        </header>
-        <main>
-            <h1 class="intro">Available Spaces</h1>
-            <section class="spaces">
-                {% for space in available_spaces %}
+            {% endif %}
+            <form action="/logout" method="POST" style="display: inline; margin:0; padding: 0;">
+                <button type="submit" class="navigation">Log Out</button>
+            </form>
+        </nav>
+    </header>
+    <main>
+        <h1 class="intro">Available Spaces</h1>
+        <section class="spaces">
+            {% for space in available_spaces %}
+                <article class="space-card" style="margin-bottom: 1.5rem;">
                     <a class="space-link" href="/make_request/{{ space.id }}">
-                        <article class="space-card">
-                            <h2 class="space-details">{{ space.space_name }}</h2>
-                            <p class="space-price">£{{ space.price }} per night</p>
-                            <p class="space-description">{{ space.description }}</p>
-                        </article>
+                        <h2 class="space-details">{{ space.space_name }}</h2>
+                        <p class="space-price">£{{ space.price }} per night</p>
+                        <p class="space-description">{{ space.description }}</p>
                     </a>
-                {% endfor %}
-            </section>
-        </main>
-    </body>
+                    {% if is_logged_in %}
+                        {% if space.id in favourite_ids %}
+                            <form action="/spaces/{{ space.id }}/unfavourite" method="POST" style="margin-top: 0.75rem;">
+                                <button type="submit" class="navigation">Remove from Favourites</button>
+                            </form>
+                        {% else %}
+                            <form action="/spaces/{{ space.id }}/favourite" method="POST" style="margin-top: 0.75rem;">
+                                <button type="submit" class="navigation">Add to Favourites</button>
+                            </form>
+                        {% endif %}
+                    {% endif %}
+                </article>
+            {% endfor %}
+        </section>
+    </main>
+</body>
 </html>

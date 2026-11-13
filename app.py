@@ -13,6 +13,7 @@ from lib.request_repository import RequestRepository
 from lib.user import User
 from lib.user_repository import UserRepository
 from werkzeug.security import generate_password_hash, check_password_hash
+from lib.favourite_repository import FavouriteRepository
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "dev-secret-change-me")
@@ -171,7 +172,7 @@ def post_booking_request(id):
     booking_request = Request(
         space_id=space.id,
         user_id=session["user_id"],
-        approved=False,
+        approved_status='pending',
         start_date=start_date,
         end_date=end_date,
         host_id=space.user_id,  # always the space's owner, never taken from the form
@@ -266,19 +267,26 @@ def get_requests():
 def post_request_declined(request_id):
     repo = RequestRepository(get_connection())
     if not repo.check_ownership(request_id):
-        flash("Sorry, You are not the owner of this request")
+        flash("Sorry, you are not the owner of this request.")
     else:
-        repo.reject_request(request_id)
+        try:
+            repo.update_request_status(request_id, 'declined')
+        except ValueError as error:
+            flash(str(error))
     return redirect("/requests")
 
 @app.route('/requests/<request_id>/approve', methods=['POST'])
 def post_request_approved(request_id):
     repo = RequestRepository(get_connection())
     if not repo.check_ownership(request_id):
-        flash("Sorry, You are not the owner of this request, try logging in again to see your requests.")
-    elif not repo.approve_request(request_id):
-        flash("Sorry, some of those dates are already booked for this space, so the request is still pending.")
+        flash("Sorry, you are not the owner of this request.")
+    else:
+        try:
+            repo.update_request_status(request_id, 'approved')
+        except ValueError as error:
+            flash(str(error))
     return redirect("/requests")
+
 
 # -- stripe payment routes -- #
 
@@ -296,7 +304,7 @@ def create_checkout_session(request_id):
     if not booking_request or booking_request.user_id != session['user_id']:
         flash("Request not found.", "error")
         return redirect("/requests")
-    if not booking_request.approved:
+    if booking_request.approved_status != 'approved':
         flash("This request hasn't been approved yet.", "error")
         return redirect("/requests")
     if booking_request.paid:
@@ -382,14 +390,67 @@ def get_all_available_spaces():
     available_spaces_repository = SpaceRepository(connection)
     available_spaces = available_spaces_repository.all()
     user_id = session.get("user_id")
+    is_logged_in = bool(user_id)
     is_host = False
+    favourite_ids = set()
     if user_id:
         user_repo = UserRepository(connection)
         user = next((u for u in user_repo.all() if u.id == user_id), None)
         if user:
             is_host = user.host
+        fav_repo = FavouriteRepository(connection)
+        favourite_ids = fav_repo.find_space_ids_by_user(user_id)
+        
+    return render_template("available_spaces.html", available_spaces=available_spaces, is_host=is_host, is_logged_in=is_logged_in, favourite_ids=favourite_ids)
 
-    return render_template("available_spaces.html", available_spaces=available_spaces, is_host=is_host)
+@app.route("/favourites", methods=["GET"])
+def get_favourites():
+    user_id = session.get("user_id")
+    if not user_id:
+        return redirect("/login")
+
+    connection = DatabaseConnection()
+    connection.connect()
+    fav_repo = FavouriteRepository(connection)
+    user_repo = UserRepository(connection)
+
+    user = next((u for u in user_repo.all() if u.id == user_id), None)
+    is_host = user.host if user else False
+    favourite_spaces = fav_repo.find_spaces_by_user(user_id)
+
+    return render_template(
+        "favourites.html",
+        favourite_spaces=favourite_spaces,
+        is_host=is_host
+    )
+
+
+@app.route("/spaces/<int:space_id>/favourite", methods=["POST"])
+def add_favourite(space_id):
+    user_id = session.get("user_id")
+    if not user_id:
+        return redirect("/login")
+
+    connection = DatabaseConnection()
+    connection.connect()
+    fav_repo = FavouriteRepository(connection)
+    fav_repo.add(user_id, space_id)
+
+    return redirect(request.referrer or "/spaces")
+
+
+@app.route("/spaces/<int:space_id>/unfavourite", methods=["POST"])
+def remove_favourite(space_id):
+    user_id = session.get("user_id")
+    if not user_id:
+        return redirect("/login")
+
+    connection = DatabaseConnection()
+    connection.connect()
+    fav_repo = FavouriteRepository(connection)
+    fav_repo.remove(user_id, space_id)
+
+    return redirect(request.referrer or "/favourites")
 
 # Receive signup form and save new user
 @app.route('/users', methods=['POST'])
