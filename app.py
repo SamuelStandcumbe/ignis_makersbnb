@@ -82,9 +82,17 @@ def create_sessions():
 # View form to create a new space (logged-in users only)
 @app.route('/spaces/new', methods=['GET'])
 def get_create_space_form():
-    if "user_id" not in session:
+    user_id = session.get("user_id")
+    if not user_id:
         return redirect("/login")
-    return render_template("create_new_space.html", errors=[], form={})
+
+    connection = get_connection()
+    user_repo = UserRepository(connection)
+    user = next((u for u in user_repo.all() if u.id == user_id), None)
+    if not user or not user.host:
+        return redirect("/spaces")
+
+    return render_template("create_new_space.html", errors=[], form={}, is_host=True)
 
 # Save a new space for the logged-in user
 @app.route('/spaces', methods=['POST'])
