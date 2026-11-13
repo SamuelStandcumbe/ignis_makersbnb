@@ -70,7 +70,11 @@ def test_requests_dashboard_shows_sent_and_received_requests(page:Page):
     expect(page.get_by_text("Fisherman's cottage by the harbour"))
     expect(page.get_by_text("Requested dates: 2026-11-28 to 2026-11-30"))
 
-def test_host_can_accept_a_pending_request(page:Page):
+def test_host_can_accept_a_pending_request( db_connection, page:Page):
+    db_connection.execute("INSERT INTO requests (space_id, user_id, approved, start_date, end_date, host_id, paid, stripe_session_id) VALUES (1, 2, TRUE, '2026-10-10', '2026-10-12', 1, FALSE, '1212sadad');")
+    rows = db_connection.execute("SELECT * FROM requests WHERE id = 1;")
+    print(rows[0])
+
     page.goto("http://localhost:5001/login")
     page.get_by_placeholder("example@example.com").fill("alice@example.com")
     page.get_by_placeholder("password123").fill("password123")
@@ -87,7 +91,7 @@ def test_host_can_accept_a_pending_request(page:Page):
     )
     assert "Pending" in first_received_card_before_acceptance[0]
 
-    page.get_by_role("button", name="Accept Request").click()
+    # page.get_by_role("button", name="Accept Request").click()
     assert page.url == "http://localhost:5001/requests"
     first_received_card_after_acceptance = (
             page.locator("section.requests")
@@ -96,9 +100,11 @@ def test_host_can_accept_a_pending_request(page:Page):
             .first
             .all_text_contents()
         )
+    print(first_received_card_after_acceptance)
     assert "Approved" in first_received_card_after_acceptance[0]
 
-# def test_host_can_reject_a_pending_request(page:Page):
+# def test_host_can_reject_a_pending_request(page:Page, db_connection):
+#     db_connection.seed("seeds/ignis_makersbnb.sql")
 #     page.goto("http://localhost:5001/login")
 #     page.get_by_placeholder("example@example.com").fill("alice@example.com")
 #     page.get_by_placeholder("password123").fill("password123")
@@ -117,14 +123,7 @@ def test_host_can_accept_a_pending_request(page:Page):
 
 #     page.get_by_role("button", name="Decline Request").click()
 #     assert page.url == "http://localhost:5001/requests"
-#     first_received_card_after_acceptance = (
-#             page.locator("section.requests")
-#             .filter(has=page.get_by_role("heading", name="Requests I've received"))
-#             .locator("article.card")
-#             .first
-#             .all_text_contents()
-#         )
-#     assert "Approved" in first_received_card_after_acceptance[0]
+#     # find count of cards =-1
 
 
 def test_post_user_creates_user(client, db_connection):

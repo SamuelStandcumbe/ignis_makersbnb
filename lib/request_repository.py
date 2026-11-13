@@ -72,7 +72,7 @@ class RequestRepository:
         found = self.find_request_by_id(request_id)
         if not found:
             return False
-        booking_request = found[0]
+        booking_request = found
         # Only accept if the host id of the requested space is the same as the user id of the session
         if session["user_id"] != booking_request.host_id:
             return False
