@@ -171,7 +171,7 @@ def post_booking_request(id):
     booking_request = Request(
         space_id=space.id,
         user_id=session["user_id"],
-        approved=False,
+        approved_status='pending',
         start_date=start_date,
         end_date=end_date,
         host_id=space.user_id,  # always the space's owner, never taken from the form
@@ -266,19 +266,26 @@ def get_requests():
 def post_request_declined(request_id):
     repo = RequestRepository(get_connection())
     if not repo.check_ownership(request_id):
-        flash("Sorry, You are not the owner of this request")
+        flash("Sorry, you are not the owner of this request.")
     else:
-        repo.reject_request(request_id)
+        try:
+            repo.update_request_status(request_id, 'declined')
+        except ValueError as error:
+            flash(str(error))
     return redirect("/requests")
 
 @app.route('/requests/<request_id>/approve', methods=['POST'])
 def post_request_approved(request_id):
     repo = RequestRepository(get_connection())
     if not repo.check_ownership(request_id):
-        flash("Sorry, You are not the owner of this request, try logging in again to see your requests.")
-    elif not repo.approve_request(request_id):
-        flash("Sorry, some of those dates are already booked for this space, so the request is still pending.")
+        flash("Sorry, you are not the owner of this request.")
+    else:
+        try:
+            repo.update_request_status(request_id, 'approved')
+        except ValueError as error:
+            flash(str(error))
     return redirect("/requests")
+
 
 # -- stripe payment routes -- #
 
@@ -296,7 +303,7 @@ def create_checkout_session(request_id):
     if not booking_request or booking_request.user_id != session['user_id']:
         flash("Request not found.", "error")
         return redirect("/requests")
-    if not booking_request.approved:
+    if booking_request.approved_status != 'approved':
         flash("This request hasn't been approved yet.", "error")
         return redirect("/requests")
     if booking_request.paid:
