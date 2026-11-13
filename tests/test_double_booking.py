@@ -70,7 +70,7 @@ def test_host_sees_message_when_approval_fails(client, db_connection):
     add_request(db_connection, 1, 2, NEXT_MONTH, NEXT_MONTH + timedelta(days=2), approved_status='approved')
     clashing = add_request(db_connection, 1, carol, NEXT_MONTH, NEXT_MONTH)
 
-    response = client.post(f"/requests/1/{clashing}/approve")
+    response = client.post(f"/requests/{clashing}/approve")
     assert response.status_code == 302
     assert response.headers["Location"] == "/requests"
 

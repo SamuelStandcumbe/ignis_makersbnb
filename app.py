@@ -21,7 +21,8 @@ app.secret_key = os.getenv("SECRET_KEY", "dev-secret-change-me")
 stripe.api_key = os.environ.get("STRIPE_SECRET_KEY")
 
 def get_connection():
-    connection = DatabaseConnection(test_mode=app.config.get("TESTING", False))
+    test_mode = app.config.get("TESTING", False) or os.getenv("APP_ENV") == "test"
+    connection = DatabaseConnection(test_mode=test_mode)
     connection.connect()
     return connection
 
@@ -80,9 +81,17 @@ def create_sessions():
 # View form to create a new space (logged-in users only)
 @app.route('/spaces/new', methods=['GET'])
 def get_create_space_form():
-    if "user_id" not in session:
+    user_id = session.get("user_id")
+    if not user_id:
         return redirect("/login")
-    return render_template("create_new_space.html", errors=[], form={})
+
+    connection = get_connection()
+    user_repo = UserRepository(connection)
+    user = next((u for u in user_repo.all() if u.id == user_id), None)
+    if not user or not user.host:
+        return redirect("/spaces")
+
+    return render_template("create_new_space.html", errors=[], form={}, is_host=True)
 
 # Save a new space for the logged-in user
 @app.route('/spaces', methods=['POST'])
@@ -253,23 +262,30 @@ def get_requests():
     else:
         return redirect("/login")
 
-@app.route('/requests/<user_id>/<request_id>/reject', methods=['POST'])
-def post_request_declined(user_id, request_id):
+@app.route('/requests/<request_id>/reject', methods=['POST'])
+def post_request_declined(request_id):
     repo = RequestRepository(get_connection())
-    try:
-        repo.update_request_status(request_id, 'declined')
-    except ValueError as error:
-        flash(str(error))
+    if not repo.check_ownership(request_id):
+        flash("Sorry, you are not the owner of this request.")
+    else:
+        try:
+            repo.update_request_status(request_id, 'declined')
+        except ValueError as error:
+            flash(str(error))
     return redirect("/requests")
 
-@app.route('/requests/<user_id>/<request_id>/approve', methods=['POST'])
-def post_request_approved(user_id, request_id):
+@app.route('/requests/<request_id>/approve', methods=['POST'])
+def post_request_approved(request_id):
     repo = RequestRepository(get_connection())
-    try:
-        repo.update_request_status(request_id, 'approved')
-    except ValueError as error:
-        flash(str(error))
+    if not repo.check_ownership(request_id):
+        flash("Sorry, you are not the owner of this request.")
+    else:
+        try:
+            repo.update_request_status(request_id, 'approved')
+        except ValueError as error:
+            flash(str(error))
     return redirect("/requests")
+
 
 # -- stripe payment routes -- #
 

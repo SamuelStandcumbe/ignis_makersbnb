@@ -1,5 +1,6 @@
 import psycopg
 from lib.request import Request
+from flask import Flask, session, flash
 
 class RequestRepository:
     def __init__(self, connection):
@@ -62,6 +63,16 @@ class RequestRepository:
         except psycopg.errors.ExclusionViolation:
             self._connection.connection.rollback()
             raise ValueError("these dates are already booked")
+
+    def check_ownership(self, request_id):
+        found = self.find_request_by_id(request_id)
+        if not found:
+            return False
+        booking_request = found
+        # Only the host who owns the space can approve or decline requests
+        if session["user_id"] != booking_request.host_id:
+            return False
+        return True
 
     def find_request_by_id(self, request_id):
         rows = self._connection.execute(
