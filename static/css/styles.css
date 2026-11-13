@@ -164,6 +164,18 @@ header {
     margin-bottom: 0.3rem;
 }
 
+.card input:not([type="checkbox"]):not([type="submit"]),
+.card textarea {
+    display: block;
+    width: 100%;
+    padding: 0.7rem;
+    border: 1px solid #E6E0EB;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-family: inherit;
+    font-size: 1rem;
+}
+
 .card input:not([type="checkbox"]):not([type="submit"]) {
     display: block;
     width: 100%;
