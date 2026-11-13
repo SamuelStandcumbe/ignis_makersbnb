@@ -2,11 +2,9 @@ import re
 from datetime import date, timedelta
 from playwright.sync_api import Page, expect
 from werkzeug.security import generate_password_hash
-
 NEXT_MONTH = date.today() + timedelta(days=30)
 NEXT_MONTH_STR = NEXT_MONTH.strftime("%Y-%m-%d")
 END_MONTH_STR = (NEXT_MONTH + timedelta(days=3)).strftime("%Y-%m-%d")
-
 
 def test_complete_user_journey(page: Page, test_web_address, db_connection):
     db_connection.seed("seeds/ignis_makersbnb.sql")
