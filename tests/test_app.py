@@ -74,7 +74,7 @@ def test_host_can_accept_a_pending_request( db_connection, page:Page, test_web_a
 
     # Ensure there is a single request
     db_connection.execute("TRUNCATE TABLE requests;")
-    db_connection.execute("INSERT INTO requests (space_id, user_id, approved, start_date, end_date, host_id, paid, stripe_session_id) VALUES (1, 2, FALSE, '2026-10-10', '2026-10-12', 1, FALSE, '1212sadad');")
+    db_connection.execute("INSERT INTO requests (space_id, user_id, approved_status, start_date, end_date, host_id, paid, stripe_session_id) VALUES (1, 2, 'pending', '2026-10-10', '2026-10-12', 1, FALSE, '1212sadad');")
 
     base_url = test_web_address
 
@@ -113,7 +113,7 @@ def test_host_can_reject_a_pending_request(page:Page, db_connection, test_web_ad
 
     # Ensure there is a single request
     db_connection.execute('TRUNCATE TABLE requests;')
-    db_connection.execute("INSERT INTO requests (space_id, user_id, approved, start_date, end_date, host_id, paid, stripe_session_id) VALUES (1, 2, FALSE, '2026-10-10', '2026-10-12', 1, FALSE, '1212sadad');")
+    db_connection.execute("INSERT INTO requests (space_id, user_id, approved_status, start_date, end_date, host_id, paid, stripe_session_id) VALUES (1, 2, 'pending', '2026-10-10', '2026-10-12', 1, FALSE, '1212sadad');")
 
     base_url = test_web_address
 
@@ -136,11 +136,19 @@ def test_host_can_reject_a_pending_request(page:Page, db_connection, test_web_ad
     )
     assert "Pending" in first_received_card_before_acceptance[0]
 
-    # Press Reject and assert that the card is not there.
+    # Decline the request and verify it remains visible
     page.get_by_role("button", name="Decline Request").click()
     assert page.url == f"{base_url}/requests"
-    card_count = page.locator("section.requests").locator("article.card").count()
-    assert card_count == 0
+    received_section = page.locator("section.requests").filter(
+        has=page.get_by_role("heading", name="Requests I've received")
+    )
+    cards = received_section.locator("article.card")
+    assert cards.count() == 1
+    assert cards.first.locator(".status-declined").inner_text() == "Declined"
+
+    # A resolved request cannot be approved or declined again
+    assert cards.first.get_by_role("button", name="Accept Request").count() == 0
+    assert cards.first.get_by_role("button", name="Decline Request").count() == 0
 
 
 
