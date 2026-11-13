@@ -162,7 +162,7 @@ def post_booking_request(id):
     booking_request = Request(
         space_id=space.id,
         user_id=session["user_id"],
-        approved=False,
+        approved_status='pending',
         start_date=start_date,
         end_date=end_date,
         host_id=space.user_id,  # always the space's owner, never taken from the form
@@ -256,14 +256,19 @@ def get_requests():
 @app.route('/requests/<user_id>/<request_id>/reject', methods=['POST'])
 def post_request_declined(user_id, request_id):
     repo = RequestRepository(get_connection())
-    repo.reject_request(request_id)
+    try:
+        repo.update_request_status(request_id, 'declined')
+    except ValueError as error:
+        flash(str(error))
     return redirect("/requests")
 
 @app.route('/requests/<user_id>/<request_id>/approve', methods=['POST'])
 def post_request_approved(user_id, request_id):
     repo = RequestRepository(get_connection())
-    if not repo.approve_request(request_id):
-        flash("Sorry, some of those dates are already booked for this space, so the request is still pending.")
+    try:
+        repo.update_request_status(request_id, 'approved')
+    except ValueError as error:
+        flash(str(error))
     return redirect("/requests")
 
 # -- stripe payment routes -- #
@@ -282,7 +287,7 @@ def create_checkout_session(request_id):
     if not booking_request or booking_request.user_id != session['user_id']:
         flash("Request not found.", "error")
         return redirect("/requests")
-    if not booking_request.approved:
+    if booking_request.approved_status != 'approved':
         flash("This request hasn't been approved yet.", "error")
         return redirect("/requests")
     if booking_request.paid:

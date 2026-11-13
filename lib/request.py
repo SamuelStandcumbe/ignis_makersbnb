@@ -1,11 +1,11 @@
 from datetime import timedelta
 
 class Request:
-    def __init__(self, space_id, user_id, approved, start_date, end_date, host_id, id=None, paid=False, stripe_session_id=None):
+    def __init__(self, space_id, user_id, approved_status, start_date, end_date, host_id, id=None, paid=False, stripe_session_id=None):
         self.id = id
         self.space_id = space_id
         self.user_id = user_id
-        self.approved = approved
+        self.approved_status = approved_status
         self.start_date = start_date
         self.end_date = end_date
         self.paid = paid
@@ -33,4 +33,4 @@ class Request:
         return self.__dict__ == other.__dict__
 
     def __repr__(self):
-        return f"Request({self.space_id}, {self.user_id}, {self.approved}, {self.start_date}, {self.end_date}, {self.host_id}, {self.id}, {self.paid}, {self.stripe_session_id})"
+        return f"Request({self.space_id}, {self.user_id}, {self.approved_status}, {self.start_date}, {self.end_date}, {self.host_id}, {self.id}, {self.paid}, {self.stripe_session_id})"
