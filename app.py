@@ -21,7 +21,8 @@ app.secret_key = os.getenv("SECRET_KEY", "dev-secret-change-me")
 stripe.api_key = os.environ.get("STRIPE_SECRET_KEY")
 
 def get_connection():
-    connection = DatabaseConnection(test_mode=app.config.get("TESTING", False))
+    test_mode = app.config.get("TESTING", False) or os.getenv("APP_ENV") == "test"
+    connection = DatabaseConnection(test_mode=test_mode)
     connection.connect()
     return connection
 
