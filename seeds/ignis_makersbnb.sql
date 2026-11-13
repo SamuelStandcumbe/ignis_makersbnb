@@ -1,6 +1,7 @@
 -- Needed for the no_double_booking rule on requests (lets space_id use = inside an EXCLUDE constraint)
 CREATE EXTENSION IF NOT EXISTS btree_gist;
 
+DROP TABLE IF EXISTS favourites;
 DROP TABLE IF EXISTS requests;
 DROP TABLE IF EXISTS spaces;
 DROP TABLE IF EXISTS users;
@@ -42,6 +43,13 @@ CREATE TABLE requests (
         daterange(start_date, end_date, '[]') WITH &&
     ) WHERE (approved)
     );
+
+CREATE TABLE favourites (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    space_id INTEGER NOT NULL REFERENCES spaces(id) ON DELETE CASCADE,
+    UNIQUE (user_id, space_id)
+);
 
 INSERT INTO users (full_name, email, password, host) VALUES (
     'Alice Example',

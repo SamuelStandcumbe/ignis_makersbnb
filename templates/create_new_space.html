@@ -13,9 +13,8 @@
             <nav aria-label="Main Navigation">
                 <a class="navigation" href="/spaces">Spaces</a>
                 <a class="navigation" href="/requests">Requests</a>
-                {% if is_host %}
+                <a class="navigation" href="/favourites">❤️</a>
                 <a class="navigation current-page" href="/spaces/new" aria-current="page">Create Space</a>
-                {% endif %}
                 <form action="/logout" method="POST" style="display: inline; margin:0; padding: 0;">
                     <button type="submit" class="navigation">Log Out</button>
                 </form>
