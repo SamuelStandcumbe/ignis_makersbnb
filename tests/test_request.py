@@ -21,7 +21,7 @@ def test_equality():
 #test readable string format
 def test_requests_repr():
     request = Request(1, 2, False, date(2026, 10, 10), date(2026, 10, 12), 1, 1)
-    assert repr(request) == "Request(1, 2, False, 2026-10-10, 2026-10-12, 1, 1)"
+    assert repr(request) == "Request(1, 2, False, 2026-10-10, 2026-10-12, 1, 1, False, None)"
 
 #test date range is valid
 def test_date_within_range_is_valid():
@@ -54,8 +54,10 @@ def test_dates_in_different_months():
     request = Request(1, 1, True, date(2026, 12, 30), date(2027, 1, 2), 1)
     assert request.dates() == [date(2026, 12, 30), date(2026, 12, 31), date(2027, 1, 1), date(2027, 1, 2)]
 
-#test that request can instance when given an id
+# Test that request can instance when given an id
 def test_request_instancing_with_id():
     request = Request(1, 2, False, date(2026, 10, 10), date(2026, 10, 12), 1, 1)
     assert request.id == 1
+    assert request.paid == False
+    assert request.stripe_session_id is None
 
