@@ -262,16 +262,21 @@ def get_requests():
     else:
         return redirect("/login")
 
-@app.route('/requests/<user_id>/<request_id>/reject', methods=['POST'])
-def post_request_declined(user_id, request_id):
+@app.route('/requests/<request_id>/reject', methods=['POST'])
+def post_request_declined(request_id):
     repo = RequestRepository(get_connection())
-    repo.reject_request(request_id)
+    if not repo.check_ownership(request_id):
+        flash("Sorry, You are not the owner of this request")
+    else:
+        repo.reject_request(request_id)
     return redirect("/requests")
 
-@app.route('/requests/<user_id>/<request_id>/approve', methods=['POST'])
-def post_request_approved(user_id, request_id):
+@app.route('/requests/<request_id>/approve', methods=['POST'])
+def post_request_approved(request_id):
     repo = RequestRepository(get_connection())
-    if not repo.approve_request(request_id):
+    if not repo.check_ownership(request_id):
+        flash("Sorry, You are not the owner of this request, try logging in again to see your requests.")
+    elif not repo.approve_request(request_id):
         flash("Sorry, some of those dates are already booked for this space, so the request is still pending.")
     return redirect("/requests")
 

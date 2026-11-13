@@ -70,6 +70,79 @@ def test_requests_dashboard_shows_sent_and_received_requests(client, page: Page,
     expect(page.get_by_text("Fisherman's cottage by the harbour"))
     expect(page.get_by_text("Requested dates: 2026-11-28 to 2026-11-30"))
 
+def test_host_can_accept_a_pending_request( db_connection, page:Page, test_web_address):
+
+    # Ensure there is a single request
+    db_connection.execute("TRUNCATE TABLE requests;")
+    db_connection.execute("INSERT INTO requests (space_id, user_id, approved, start_date, end_date, host_id, paid, stripe_session_id) VALUES (1, 2, FALSE, '2026-10-10', '2026-10-12', 1, FALSE, '1212sadad');")
+
+    base_url = test_web_address
+
+    #  Alice logs in and redirects to spaces
+    page.goto(f"{base_url}/login")
+    page.get_by_placeholder("example@example.com").fill("alice@example.com")
+    page.get_by_placeholder("password123").fill("password123")
+    page.get_by_role("button", name="Log In").click()
+    assert page.url == f"{base_url}/spaces"
+
+    # Click requests page and assert that the button says pending
+    page.get_by_role("link", name="Requests").click()
+    assert page.url == f"{base_url}/requests"
+    first_received_card_before_acceptance = (
+        page.locator("section.requests")
+        .filter(has=page.get_by_role("heading", name="Requests I've received"))
+        .locator("article.card")
+        .first
+        .all_text_contents()
+    )
+    assert "Pending" in first_received_card_before_acceptance[0]
+
+    # Press Accept and assert that the status is approved.
+    page.get_by_role("button", name="Accept Request").click()
+    assert page.url == f"{base_url}/requests"
+    first_received_card_after_acceptance = (
+            page.locator("section.requests")
+            .filter(has=page.get_by_role("heading", name="Requests I've received"))
+            .locator("article.card")
+            .first
+            .all_text_contents()
+        )
+    assert "Approved" in first_received_card_after_acceptance[0]
+
+def test_host_can_reject_a_pending_request(page:Page, db_connection, test_web_address):
+
+    # Ensure there is a single request
+    db_connection.execute('TRUNCATE TABLE requests;')
+    db_connection.execute("INSERT INTO requests (space_id, user_id, approved, start_date, end_date, host_id, paid, stripe_session_id) VALUES (1, 2, FALSE, '2026-10-10', '2026-10-12', 1, FALSE, '1212sadad');")
+
+    base_url = test_web_address
+
+    #  Alice logs in and redirects to spaces
+    page.goto(f"{base_url}/login")
+    page.get_by_placeholder("example@example.com").fill("alice@example.com")
+    page.get_by_placeholder("password123").fill("password123")
+    page.get_by_role("button", name="Log In").click()
+    assert page.url == f"{base_url}/spaces"
+
+    # Click requests page and assert that the button says pending
+    page.get_by_role("link", name="Requests").click()
+    assert page.url == f"{base_url}/requests"
+    first_received_card_before_acceptance = (
+        page.locator("section.requests")
+        .filter(has=page.get_by_role("heading", name="Requests I've received"))
+        .locator("article.card")
+        .first
+        .all_text_contents()
+    )
+    assert "Pending" in first_received_card_before_acceptance[0]
+
+    # Press Reject and assert that the card is not there.
+    page.get_by_role("button", name="Decline Request").click()
+    assert page.url == f"{base_url}/requests"
+    card_count = page.locator("section.requests").locator("article.card").count()
+    assert card_count == 0
+
+
 
 def test_post_user_creates_user(client, db_connection):
     response = client.post("/users", data={
